@@ -7,10 +7,15 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: "creator" | "buyer";
+  isVerified: boolean;
+  verificationCode: string;
+  verificationCodeExpiry: Date;
+  verificationCodeAttempts: number;
 }
 
 export interface IUserMethods {
   comparePassword(candidatePassword: string): Promise<boolean>;
+  compareVerificationCode(candidateVerificationCode: string): Promise<boolean>;
 }
 
 type UserModelType = mongoose.Model<IUser, {}, IUserMethods>;
@@ -48,19 +53,44 @@ const UserSchema = new Schema<IUser, UserModelType, IUserMethods>({
     enum: ["creator", "buyer"],
     default: "buyer",
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationCode: {
+    type: String,
+    default: null,
+    select: false,
+  },
+  verificationCodeExpiry: {
+    type: Date,
+    default: null,
+    select: false,
+  },
+  verificationCodeAttempts: {
+    type: Number,
+    default: 0,
+    select: false,
+  },
 }, {
   timestamps: true,
   toJSON: {
-    transform: function (_doc, ret: { password?: string; __v?: number }) {
+    transform: function (_doc, ret: { password?: string; __v?: number; verificationCode?: string; verificationCodeExpiry?: Date, verificationCodeAttempts?: number }) {
       delete ret.password;
       delete ret.__v;
+      delete ret.verificationCode;
+      delete ret.verificationCodeExpiry;
+      delete ret.verificationCodeAttempts;
       return ret;
     },
   },
   toObject: {
-    transform: function (_doc, ret: { password?: string; __v?: number }) {
+    transform: function (_doc, ret: { password?: string; __v?: number; verificationCode?: string; verificationCodeExpiry?: Date, verificationCodeAttempts?: number }) {
       delete ret.password;
       delete ret.__v;
+      delete ret.verificationCode;
+      delete ret.verificationCodeExpiry;
+      delete ret.verificationCodeAttempts;
       return ret;
     },
   },
@@ -68,13 +98,31 @@ const UserSchema = new Schema<IUser, UserModelType, IUserMethods>({
 
 // Hash password before saving
 UserSchema.pre("save", async function () {
-  if (!this.isModified("password")) return;
-  this.password = await bcrypt.hash(this.password, 10);
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  if (this.isModified("verificationCode") && this.verificationCode) {
+    this.verificationCode = await bcrypt.hash(this.verificationCode, 10);
+  }
 });
 
 // Compare password
 UserSchema.methods.comparePassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
+};
+
+
+// Compare verification code
+UserSchema.methods.compareVerificationCode = async function (code: string) {
+  if (!this.verificationCode || !this.verificationCodeExpiry) return false;
+
+  if (this.verificationCodeExpiry < new Date()) return false;
+
+  const isMatch = await bcrypt.compare(code, this.verificationCode);
+  if (!isMatch) return false;
+
+  return true;
 };
 
 const UserModel =

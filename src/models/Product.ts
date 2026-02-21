@@ -94,6 +94,7 @@ const ProductSchema: Schema<IProduct> = new Schema<IProduct>({
     salesCount: {
         type: Number,
         default: 0,
+        min: [0, "Sales count must be at least 0"],
     },
     creatorId: {
         type: mongoose.Schema.Types.ObjectId,

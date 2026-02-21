@@ -1,0 +1,5 @@
+export const AUTH_CONFIG = {
+    VERIFICATION_CODE_EXPIRY_MS: 10 * 60 * 1000, // 10 min
+    MAX_VERIFICATION_ATTEMPTS: 5,
+    LOCK_TIME_MS: 15 * 60 * 1000, // 15 min lock
+};
