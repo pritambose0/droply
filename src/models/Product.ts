@@ -1,11 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 import validator from "validator";
+import { SUPPORTED_CURRENCIES } from "../constants/currencies";
 
 export interface IProduct extends Document {
     title: string;
     description: string;
     price: number;
-    currency: "USD" | "EUR" | "INR";
+    currency: typeof SUPPORTED_CURRENCIES[number];
     fileUrl: string;
     thumbnailUrl: string;
     status: "draft" | "published";
@@ -37,7 +38,7 @@ const ProductSchema: Schema<IProduct> = new Schema<IProduct>({
     },
     currency: {
         type: String,
-        enum: ["USD", "EUR", "INR"],
+        enum: SUPPORTED_CURRENCIES,
         default: "USD",
     },
     fileUrl: {
@@ -103,13 +104,15 @@ const ProductSchema: Schema<IProduct> = new Schema<IProduct>({
         required: [true, "Creator ID is required"],
     },
 }, {
-    timestamps: true, toJSON: {
+    timestamps: true,
+    toJSON: {
         transform: function (_doc, ret: { fileUrl?: string; __v?: number }) {
             delete ret.fileUrl;
             delete ret.__v;
             return ret;
         },
-    }, toObject: {
+    },
+    toObject: {
         transform: function (_doc, ret: { fileUrl?: string; __v?: number }) {
             delete ret.fileUrl;
             delete ret.__v;
