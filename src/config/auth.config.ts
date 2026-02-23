@@ -1,5 +1,12 @@
 export const AUTH_CONFIG = {
-    VERIFICATION_CODE_EXPIRY_MS: 10 * 60 * 1000, // 10 min
+    VERIFICATION_CODE_EXPIRY_MS: 10 * 60 * 1000,
     MAX_VERIFICATION_ATTEMPTS: 5,
-    LOCK_TIME_MS: 15 * 60 * 1000, // 15 min lock
+    LOCK_TIME_MS: 15 * 60 * 1000,
+};
+
+export const OTP_CONFIG = {
+    LENGTH: 6,
+    EXPIRY_MINUTES: 10,
+    MAX_ATTEMPTS: 5,
+    LOCK_MINUTES: 15,
 };
