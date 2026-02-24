@@ -8,8 +8,8 @@ export interface IUser extends Document {
   password: string;
   role: "creator" | "buyer";
   isVerified: boolean;
-  verificationCode: string;
-  verificationCodeExpiry: Date;
+  verificationCode: string | null;
+  verificationCodeExpiry: Date | null;
   verificationCodeAttempts: number;
 }
 
@@ -75,7 +75,15 @@ const UserSchema = new Schema<IUser, UserModelType, IUserMethods>({
 }, {
   timestamps: true,
   toJSON: {
-    transform: function (_doc, ret: { password?: string; __v?: number; verificationCode?: string; verificationCodeExpiry?: Date, verificationCodeAttempts?: number }) {
+    transform: function (
+      _doc,
+      ret: {
+        password?: string;
+        __v?: number;
+        verificationCode?: string | null;
+        verificationCodeExpiry?: Date | null;
+        verificationCodeAttempts?: number | null
+      }) {
       delete ret.password;
       delete ret.__v;
       delete ret.verificationCode;
@@ -85,7 +93,15 @@ const UserSchema = new Schema<IUser, UserModelType, IUserMethods>({
     },
   },
   toObject: {
-    transform: function (_doc, ret: { password?: string; __v?: number; verificationCode?: string; verificationCodeExpiry?: Date, verificationCodeAttempts?: number }) {
+    transform: function (
+      _doc,
+      ret: {
+        password?: string;
+        __v?: number;
+        verificationCode?: string | null;
+        verificationCodeExpiry?: Date | null;
+        verificationCodeAttempts?: number | null
+      }) {
       delete ret.password;
       delete ret.__v;
       delete ret.verificationCode;

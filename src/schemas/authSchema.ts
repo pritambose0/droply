@@ -28,16 +28,22 @@ export const signinSchema = z.object({
 })
 
 export const verifyCodeSchema = z.object({
+    email: z.email("Invalid email address")
+        .toLowerCase()
+        .trim(),
     code: otpCode,
 })
 
-export const forgotPasswordSchema = z.object({
+export const sendCodeSchema = z.object({
     email: z.email("Invalid email address")
         .toLowerCase()
         .trim(),
 })
 
 export const resetPasswordSchema = z.object({
+    email: z.email("Invalid email address")
+        .toLowerCase()
+        .trim(),
     code: otpCode,
     password: z.string()
         .min(6, "Password must be at least 6 characters long")
@@ -47,3 +53,9 @@ export const resetPasswordSchema = z.object({
     message: "Passwords do not match",
     path: ["confirmPassword"],
 });
+
+export type RegisterUserDto = z.infer<typeof signupSchema>;
+export type SigninUserDto = z.infer<typeof signinSchema>;
+export type VerifyCodeDto = z.infer<typeof verifyCodeSchema>;
+export type SendCodeDto = z.infer<typeof sendCodeSchema>;
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
