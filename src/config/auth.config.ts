@@ -10,3 +10,5 @@ export const OTP_CONFIG = {
     MAX_ATTEMPTS: 5,
     LOCK_MINUTES: 15,
 };
+
+export const AUTH_PAGES = ["/sign-in", "/sign-up", "/forgot-password", "/verify"];

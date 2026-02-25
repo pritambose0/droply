@@ -7,6 +7,7 @@ import { sendEmail } from "@/helpers/sendEmail";
 import VerificationEmail from "../../emails/verificationEmail";
 import { render } from "@react-email/components";
 import { OTP_CONFIG } from "@/config/auth.config";
+import logger from "@/lib/logger";
 
 export class AuthService {
     static async registerUser(data: RegisterUserDto) {
@@ -58,6 +59,10 @@ export class AuthService {
             throw new ApiError(429, "Too many attempts");
         }
 
+        if (user.verificationCodeExpiry && user.verificationCodeExpiry < new Date()) {
+            throw new ApiError(400, "OTP has expired");
+        }
+
         const isValidOTP = await user.compareVerificationCode(code);
         if (!isValidOTP) {
             user.verificationCodeAttempts++;
@@ -103,7 +108,10 @@ export class AuthService {
 
         const user = await UserModel.findOne({ email }).select("+verificationCode +verificationCodeExpiry +verificationCodeAttempts");
 
-        if (!user || !user.isVerified) return
+        if (!user || !user.isVerified) {
+            logger.info({ email }, "Forgot password requested for non-existent or unverified user");
+            return;
+        }
 
         const otp = generateOTP();
         user.verificationCode = otp;
@@ -127,7 +135,10 @@ export class AuthService {
 
         const user = await UserModel.findOne({ email }).select("+verificationCode +verificationCodeExpiry +verificationCodeAttempts");
 
-        if (!user || !user.isVerified) return
+        if (!user || !user.isVerified) {
+            logger.info({ email }, "Reset password requested for non-existent or unverified user");
+            return;
+        }
 
         if (!user.verificationCode) {
             throw new ApiError(400, "No verification code found");
@@ -135,6 +146,10 @@ export class AuthService {
 
         if (user.verificationCodeAttempts >= OTP_CONFIG.MAX_ATTEMPTS) {
             throw new ApiError(429, "Too many attempts");
+        }
+
+        if (user.verificationCodeExpiry && user.verificationCodeExpiry < new Date()) {
+            throw new ApiError(400, "OTP has expired");
         }
 
         const isValidOTP = await user.compareVerificationCode(code);

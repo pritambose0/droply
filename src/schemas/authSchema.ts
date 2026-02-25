@@ -13,7 +13,11 @@ export const signupSchema = z.object({
     email: z.email("Invalid email address").toLowerCase().trim(),
     password: z.string()
         .min(6, "Password must be at least 6 characters long")
-        .max(128, "Password must be at most 128 characters long"),
+        .max(128, "Password must be at most 128 characters long")
+        .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+            "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+        ),
     role: z.enum(["creator", "buyer"])
         .optional()
         .default("buyer"),
@@ -47,7 +51,11 @@ export const resetPasswordSchema = z.object({
     code: otpCode,
     password: z.string()
         .min(6, "Password must be at least 6 characters long")
-        .max(128, "Password must be at most 128 characters long"),
+        .max(128, "Password must be at most 128 characters long")
+        .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+            "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+        ),
     confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
