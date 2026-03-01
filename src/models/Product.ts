@@ -12,7 +12,7 @@ export interface IProduct extends Document {
     status: "draft" | "published";
     tags: string[];
     salesCount: number;
-    creatorId: mongoose.Schema.Types.ObjectId;
+    creatorId: mongoose.Types.ObjectId | string;
 }
 
 const ProductSchema: Schema<IProduct> = new Schema<IProduct>({
