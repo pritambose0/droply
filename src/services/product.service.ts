@@ -68,7 +68,7 @@ export class ProductService {
         }
 
         const products = await ProductModel.find(filter)
-            .sort({ [sortBy]: sortOrder })
+            .sort({ [sortBy]: sortOrder === "asc" ? 1 : -1 })
             .skip((page - 1) * limit)
             .limit(limit);
 

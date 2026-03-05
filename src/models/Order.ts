@@ -2,14 +2,14 @@ import mongoose, { Document, Schema } from "mongoose";
 import { SUPPORTED_CURRENCIES } from "../constants/currencies";
 
 export interface IOrder extends Document {
-    productId: mongoose.Schema.Types.ObjectId;
-    buyerId: mongoose.Schema.Types.ObjectId;
-    sellerId: mongoose.Schema.Types.ObjectId;
-    amount: number;
+    productId: mongoose.Types.ObjectId;
+    buyerId: mongoose.Types.ObjectId;
+    sellerId: mongoose.Types.ObjectId;
     currency: typeof SUPPORTED_CURRENCIES[number];
     paymentStatus: "pending" | "paid" | "failed";
     paymentId: string;
     orderStatus: "processing" | "completed" | "cancelled" | "failed";
+    price: number;
 }
 
 const OrderSchema: Schema<IOrder> = new Schema<IOrder>({
@@ -34,11 +34,11 @@ const OrderSchema: Schema<IOrder> = new Schema<IOrder>({
         index: true,
         immutable: true,
     },
-    amount: {
+    price: {
         type: Number,
-        required: [true, "Amount is required"],
-        min: [1, "Amount must be at least 1"],
-        max: [1000000, "Amount must be at most 1000000"],
+        required: [true, "Price is required"],
+        min: [1, "Price must be at least 1"],
+        max: [1000000, "Price must be at most 1000000"],
         immutable: true,
     },
     currency: {
