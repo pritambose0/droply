@@ -1,5 +1,6 @@
 import { ApiError } from "@/helpers/ApiError";
 import { validate } from "@/helpers/validate";
+import OrderModel from "@/models/Order";
 import ProductModel from "@/models/Product";
 import {
     CreateProductDto,
@@ -134,5 +135,36 @@ export class ProductService {
         await existingProduct.deleteOne();
 
         return;
+    }
+
+    static async downloadProduct(productId: string, orderId: string, userId: string) {
+        const product = await ProductModel.findById(productId).select("+fileUrl");
+
+        if (!product) {
+            throw new ApiError(404, "Product not found");
+        }
+
+        const order = await OrderModel.findById(orderId);
+        if (!order) {
+            throw new ApiError(404, "Order not found");
+        }
+
+        if (order.productId.toString() !== productId) {
+            throw new ApiError(403, "You are not authorized to download this product");
+        }
+
+        if (order.buyerId.toString() !== userId) {
+            throw new ApiError(403, "You are not authorized to download this product");
+        }
+
+        if (order.orderStatus !== "completed") {
+            throw new ApiError(403, "Order is not completed");
+        }
+
+        if (order.paymentStatus !== "paid") {
+            throw new ApiError(403, "Please complete the payment to download the product");
+        }
+
+        return product.fileUrl;
     }
 }

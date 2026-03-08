@@ -30,6 +30,8 @@ export const config = {
     matcher: [
         "/dashboard/:path*",
         "/profile/:path*",
+        "/orders/:path*",
+        "/products/:path*",
         ...AUTH_PAGES,
     ],
 };
