@@ -34,10 +34,6 @@ export const updateProductSchema = createProductSchema.partial().extend({
     productId: z.string().min(1, "Product ID is required").trim(),
 });
 
-export const deleteProductSchema = z.object({
-    productId: z.string().min(1, "Product ID is required").trim(),
-});
-
 export const getAllProductsSchema = z.object({
     page: z.number().min(1, "Page must be at least 1").optional().default(1),
     limit: z.number().min(1, "Limit must be at least 1").optional().default(10),
@@ -48,5 +44,4 @@ export const getAllProductsSchema = z.object({
 
 export type CreateProductDto = z.infer<typeof createProductSchema>;
 export type UpdateProductDto = z.infer<typeof updateProductSchema>;
-export type DeleteProductDto = z.infer<typeof deleteProductSchema>;
 export type GetAllProductsDto = z.infer<typeof getAllProductsSchema>;

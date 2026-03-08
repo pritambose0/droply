@@ -4,8 +4,6 @@ import ProductModel from "@/models/Product";
 import {
     CreateProductDto,
     createProductSchema,
-    DeleteProductDto,
-    deleteProductSchema,
     GetAllProductsDto,
     getAllProductsSchema,
     UpdateProductDto,
@@ -87,9 +85,8 @@ export class ProductService {
         return product;
     }
 
-    static async updateProduct(product: UpdateProductDto, creatorId: string) {
+    static async updateProduct(product: UpdateProductDto, creatorId: string, productId: string) {
         const {
-            productId,
             title,
             description,
             price,
@@ -123,9 +120,7 @@ export class ProductService {
         return existingProduct;
     }
 
-    static async deleteProduct(product: DeleteProductDto, creatorId: string) {
-        const { productId } = validate(deleteProductSchema, product);
-
+    static async deleteProduct(creatorId: string, productId: string) {
         const existingProduct = await ProductModel.findById(productId);
 
         if (!existingProduct) {
