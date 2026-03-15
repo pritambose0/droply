@@ -19,7 +19,7 @@ export async function proxy(req: NextRequest) {
     // Unauthenticated users can't access protected routes
     if (!token && !isAuthPage) {
         const signInUrl = new URL("/sign-in", req.url);
-        signInUrl.searchParams.set("callbackUrl", pathname);
+        signInUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
         return NextResponse.redirect(signInUrl);
     }
 
@@ -32,6 +32,9 @@ export const config = {
         "/profile/:path*",
         "/orders/:path*",
         "/products/:path*",
-        ...AUTH_PAGES,
+        "/sign-in",
+        "/sign-up",
+        "/forgot-password",
+        "/verify"
     ],
 };
