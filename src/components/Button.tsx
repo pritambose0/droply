@@ -1,5 +1,5 @@
-import { LoadingSpinner } from "@/app/(auth)/forgot-password/page";
 import { ButtonHTMLAttributes, forwardRef } from "react";
+import { Loader2 } from "lucide-react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     isLoading?: boolean;
@@ -18,7 +18,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             >
                 {isLoading ? (
                     <>
-                        <LoadingSpinner />
+                        <Loader2 className="animate-spin h-5 w-5" />
                         {loadingText || "Loading..."}
                     </>
                 ) : (

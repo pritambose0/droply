@@ -2,14 +2,9 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { ArrowRight } from "lucide-react";
 
-function ArrowRight() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 8h10M9 4l4 4-4 4" />
-    </svg>
-  );
-}
+
 
 function Counter({ end, suffix = "", label }: { end: number; suffix?: string; label: string }) {
   const [count, setCount] = useState(0);
@@ -68,7 +63,7 @@ export default function HomePage() {
             <Link
               href="/sign-up"
               id="hero-get-started"
-              className="group flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-accent to-purple-400 text-white font-medium text-base hover:opacity-90 transition-all shadow-xl shadow-accent/25 hover:shadow-accent/40 hover:scale-[1.02]"
+              className="group flex items-center gap-2 px-8 py-3.5 rounded-full bg-linear-to-r from-accent to-purple-400 text-white font-medium text-base hover:opacity-90 transition-all shadow-xl shadow-accent/25 hover:shadow-accent/40 hover:scale-[1.02]"
             >
               Start Selling Free
               <span className="group-hover:translate-x-1 transition-transform">
@@ -147,7 +142,7 @@ export default function HomePage() {
       <section className="py-24 px-6 border-t border-card-border/50">
         <div className="max-w-3xl mx-auto text-center">
           <div className="glass rounded-3xl p-12 md:p-16 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-purple-500/10 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-br from-accent/10 to-purple-500/10 pointer-events-none" />
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 Ready to launch your{" "}
@@ -160,10 +155,10 @@ export default function HomePage() {
               <Link
                 href="/sign-up"
                 id="cta-get-started"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-accent to-purple-400 text-white font-medium hover:opacity-90 transition-all shadow-xl shadow-accent/25"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-linear-to-r from-accent to-purple-400 text-white font-medium hover:opacity-90 transition-all shadow-xl shadow-accent/25"
               >
                 Get Started — It&apos;s Free
-                <ArrowRight />
+                <ArrowRight size={18} />
               </Link>
             </div>
           </div>

@@ -4,6 +4,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
     icon?: React.ReactNode;
+    rightIcon?: React.ReactNode;
     containerClassName?: string;
 }
 
@@ -13,6 +14,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             label,
             error,
             icon,
+            rightIcon,
             className,
             containerClassName,
             id,
@@ -35,25 +37,36 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                 {/* Input Wrapper */}
                 <div className="relative">
+
+                    {/* Left Icon */}
                     {icon && (
                         <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted">
                             {icon}
                         </span>
                     )}
 
+                    {/* Input */}
                     <input
                         ref={ref}
                         id={id}
                         className={`
-                        w-full pr-4 py-3 rounded-xl bg-input-bg border text-foreground placeholder-muted text-sm
+                        w-full py-3 rounded-xl bg-input-bg border text-foreground placeholder-muted text-sm
                         focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all
                         ${icon ? "pl-11" : "pl-4"}
+                        ${rightIcon ? "pr-11" : "pr-4"}
                         ${error ? "border-red-500" : "border-input-border"}
                         ${className}
                         placeholder:text-white/20
                         `}
                         {...props}
                     />
+
+                    {/* Right Icon */}
+                    {rightIcon && (
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted">
+                            {rightIcon}
+                        </span>
+                    )}
                 </div>
 
                 {/* Error */}

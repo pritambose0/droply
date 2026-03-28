@@ -30,12 +30,12 @@ function ShieldIcon() {
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<"profile" | "notifications" | "security">("profile");
-  
+
   // Profile State
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("johndoe@example.com");
   const [bio, setBio] = useState("Digital creator & designer based in San Francisco.");
-  
+
   // Notification State
   const [emailNotifs, setEmailNotifs] = useState({
     orderUpdates: true,
@@ -55,35 +55,32 @@ export default function SettingsPage() {
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Nav */}
-        <div className="w-full md:w-64 flex-shrink-0">
+        <div className="w-full md:w-64 shrink-0">
           <nav className="flex md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0">
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === "profile"
-                  ? "bg-accent/10 text-accent border border-accent/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
-              }`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === "profile"
+                ? "bg-accent/10 text-accent border border-accent/20"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
+                }`}
             >
               <UserIcon /> Profile
             </button>
             <button
               onClick={() => setActiveTab("notifications")}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === "notifications"
-                  ? "bg-accent/10 text-accent border border-accent/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
-              }`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === "notifications"
+                ? "bg-accent/10 text-accent border border-accent/20"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
+                }`}
             >
               <BellIcon /> Notifications
             </button>
             <button
               onClick={() => setActiveTab("security")}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === "security"
-                  ? "bg-accent/10 text-accent border border-accent/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
-              }`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === "security"
+                ? "bg-accent/10 text-accent border border-accent/20"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
+                }`}
             >
               <ShieldIcon /> Security
             </button>
@@ -92,14 +89,14 @@ export default function SettingsPage() {
 
         {/* Content Area */}
         <div className="flex-1 glass rounded-2xl p-6 md:p-8 animate-fade-in text-left">
-          
+
           {/* Profile Settings */}
           {activeTab === "profile" && (
             <div className="space-y-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">Public Profile</h2>
-              
+
               <div className="flex items-center gap-6 mb-8">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent to-purple-400 flex flex-col items-center justify-center text-xl font-bold text-white shadow-xl flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+                <div className="w-20 h-20 rounded-full bg-linear-to-br from-accent to-purple-400 flex flex-col items-center justify-center text-xl font-bold text-white shadow-xl shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
                   JD
                 </div>
                 <div>
@@ -142,7 +139,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex justify-end pt-4">
-                <button className="px-6 py-2.5 bg-gradient-to-r from-accent to-purple-400 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-accent/20">
+                <button className="px-6 py-2.5 bg-linear-to-r from-accent to-purple-400 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-accent/20">
                   Save Changes
                 </button>
               </div>
@@ -158,44 +155,44 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 {/* Toggle 1 */}
                 <div className="flex items-center justify-between p-4 rounded-xl border border-card-border bg-surface">
-                   <div>
-                     <h3 className="text-sm font-medium text-foreground">Order Updates</h3>
-                     <p className="text-xs text-muted-foreground">Receive emails when your orders are processed.</p>
-                   </div>
-                   <button 
-                     onClick={() => setEmailNotifs({ ...emailNotifs, orderUpdates: !emailNotifs.orderUpdates })}
-                     className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.orderUpdates ? 'bg-accent' : 'bg-surface-hover'}`}
-                   >
-                     <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.orderUpdates ? 'left-6' : 'left-1'}`} />
-                   </button>
+                  <div>
+                    <h3 className="text-sm font-medium text-foreground">Order Updates</h3>
+                    <p className="text-xs text-muted-foreground">Receive emails when your orders are processed.</p>
+                  </div>
+                  <button
+                    onClick={() => setEmailNotifs({ ...emailNotifs, orderUpdates: !emailNotifs.orderUpdates })}
+                    className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.orderUpdates ? 'bg-accent' : 'bg-surface-hover'}`}
+                  >
+                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.orderUpdates ? 'left-6' : 'left-1'}`} />
+                  </button>
                 </div>
 
                 {/* Toggle 2 */}
                 <div className="flex items-center justify-between p-4 rounded-xl border border-card-border bg-surface">
-                   <div>
-                     <h3 className="text-sm font-medium text-foreground">Promotions</h3>
-                     <p className="text-xs text-muted-foreground">Receive exclusive offers and promotional news.</p>
-                   </div>
-                   <button 
-                     onClick={() => setEmailNotifs({ ...emailNotifs, promotions: !emailNotifs.promotions })}
-                     className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.promotions ? 'bg-accent' : 'bg-surface-hover'}`}
-                   >
-                     <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.promotions ? 'left-6' : 'left-1'}`} />
-                   </button>
+                  <div>
+                    <h3 className="text-sm font-medium text-foreground">Promotions</h3>
+                    <p className="text-xs text-muted-foreground">Receive exclusive offers and promotional news.</p>
+                  </div>
+                  <button
+                    onClick={() => setEmailNotifs({ ...emailNotifs, promotions: !emailNotifs.promotions })}
+                    className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.promotions ? 'bg-accent' : 'bg-surface-hover'}`}
+                  >
+                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.promotions ? 'left-6' : 'left-1'}`} />
+                  </button>
                 </div>
 
                 {/* Toggle 3 */}
                 <div className="flex items-center justify-between p-4 rounded-xl border border-card-border bg-surface">
-                   <div>
-                     <h3 className="text-sm font-medium text-foreground">New Products</h3>
-                     <p className="text-xs text-muted-foreground">Get notified when creators you follow post new items.</p>
-                   </div>
-                   <button 
-                     onClick={() => setEmailNotifs({ ...emailNotifs, newProducts: !emailNotifs.newProducts })}
-                     className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.newProducts ? 'bg-accent' : 'bg-surface-hover'}`}
-                   >
-                     <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.newProducts ? 'left-6' : 'left-1'}`} />
-                   </button>
+                  <div>
+                    <h3 className="text-sm font-medium text-foreground">New Products</h3>
+                    <p className="text-xs text-muted-foreground">Get notified when creators you follow post new items.</p>
+                  </div>
+                  <button
+                    onClick={() => setEmailNotifs({ ...emailNotifs, newProducts: !emailNotifs.newProducts })}
+                    className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.newProducts ? 'bg-accent' : 'bg-surface-hover'}`}
+                  >
+                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.newProducts ? 'left-6' : 'left-1'}`} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -205,20 +202,20 @@ export default function SettingsPage() {
           {activeTab === "security" && (
             <div className="space-y-8">
               <div>
-                 <h2 className="text-lg font-semibold text-foreground mb-4">Change Password</h2>
-                 <div className="space-y-4 max-w-sm">
-                   <div className="space-y-2">
-                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Current Password</label>
-                     <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all" />
-                   </div>
-                   <div className="space-y-2">
-                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">New Password</label>
-                     <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all" />
-                   </div>
-                   <button className="px-6 py-2.5 bg-surface text-foreground text-sm font-medium rounded-xl hover:bg-surface-hover transition-colors">
-                     Update Password
-                   </button>
-                 </div>
+                <h2 className="text-lg font-semibold text-foreground mb-4">Change Password</h2>
+                <div className="space-y-4 max-w-sm">
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Current Password</label>
+                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">New Password</label>
+                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all" />
+                  </div>
+                  <button className="px-6 py-2.5 bg-surface text-foreground text-sm font-medium rounded-xl hover:bg-surface-hover transition-colors">
+                    Update Password
+                  </button>
+                </div>
               </div>
 
               <div className="h-px w-full bg-card-border" />
