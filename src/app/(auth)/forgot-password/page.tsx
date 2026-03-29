@@ -3,19 +3,18 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { SendCodeDto, sendCodeSchema, signinSchema, SigninUserDto } from "@/schemas/authSchema";
+import { SendCodeDto, sendCodeSchema } from "@/schemas/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { Mail, Key, CheckCircle2, Loader2 } from "lucide-react";
-
-
+import { Mail, Key, CheckCircle2 } from "lucide-react";
+import { AuthAPI } from "@/lib/apiClient";
+import { ApiError } from "@/lib/axios";
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
-
-  const { register, formState: { errors }, getValues, handleSubmit } = useForm<SendCodeDto>({
+  const { register, formState: { errors }, getValues, handleSubmit, setError } = useForm<SendCodeDto>({
     resolver: zodResolver(sendCodeSchema),
     defaultValues: {
       email: "",
@@ -25,12 +24,16 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data: SendCodeDto) => {
     setIsLoading(true);
-
-    // Simulate API call — wire up to /api/auth/forgot-password
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await AuthAPI.forgotPassword(data);
       setIsSent(true);
-    }, 1500);
+    } catch (err) {
+      setIsSent(false);
+      const apiError = err as ApiError;
+      setError("email", { type: "server", message: apiError.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSent) {
@@ -41,13 +44,22 @@ export default function ForgotPasswordPage() {
             <CheckCircle2 size={32} className="text-success" />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-foreground mb-2">Check your email</h1>
-        <p className="text-sm text-muted-foreground mb-6">
-          We sent a password reset code to <strong className="text-foreground">{getValues("email")}</strong>.
-          Enter it on the next page along with your new password.
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          Check your email
+        </h1>
+
+        <p className="text-sm text-muted-foreground mb-4">
+          If an account exists for{" "}
+          <strong className="text-foreground">{getValues("email")}</strong>,
+          we’ve sent a password reset code.
         </p>
+
+        <p className="text-sm text-muted-foreground mb-6">
+          Enter the code on the next screen to reset your password.
+        </p>
+
         <Link
-          href={`/reset-password?email=${getValues("email")}`}
+          href={`/reset-password?email=${encodeURIComponent(getValues("email"))}`}
           id="forgot-go-to-reset"
           className="block w-full py-3 rounded-xl bg-linear-to-r from-accent to-purple-400 text-white font-medium text-sm hover:opacity-90 transition-all shadow-lg shadow-accent/20"
         >
@@ -55,7 +67,7 @@ export default function ForgotPasswordPage() {
         </Link>
         <Link
           href="/sign-in"
-          id="forgot-back-to-signin"
+          id="forgot-back-to-signin-success"
           className="block mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           ← Back to Sign In

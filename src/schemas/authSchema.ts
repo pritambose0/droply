@@ -18,9 +18,7 @@ export const signupSchema = z.object({
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
             "Password must contain at least one uppercase letter, one lowercase letter, and one number"
         ),
-    role: z.enum(["creator", "buyer"])
-        .optional()
-        .default("buyer"),
+    role: z.enum(["creator", "buyer"]),
 })
 
 export const signinSchema = z.object({
