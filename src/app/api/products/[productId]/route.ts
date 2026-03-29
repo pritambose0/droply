@@ -3,10 +3,10 @@ import { ApiResponse } from "@/helpers/ApiResponse";
 import { handleRequest } from "@/helpers/handleRequest";
 import { ProductService } from "@/services/product.service";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 
-export async function GET({ params }: { params: Promise<{ productId: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ productId: string }> }) {
     return handleRequest(async () => {
         const product = await ProductService.getProductById((await params).productId);
 
@@ -28,7 +28,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ pr
     })
 }
 
-export async function DELETE({ params }: { params: Promise<{ productId: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ productId: string }> }) {
     return handleRequest(async () => {
         const session = await getServerSession(authOptions);
 

@@ -1,12 +1,12 @@
 import { ApiResponse } from "@/helpers/ApiResponse";
 import { handleRequest } from "@/helpers/handleRequest";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import { ApiError } from "@/helpers/ApiError";
 import { OrderService } from "@/services/order.service";
 
-export async function GET({ params }: { params: Promise<{ orderId: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
     return handleRequest(async () => {
         const session = await getServerSession(authOptions);
 

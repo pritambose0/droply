@@ -5,7 +5,7 @@ import Input from "@/components/Input";
 import { ResetPasswordDto, resetPasswordSchema } from "@/schemas/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { Lock, Eye, EyeOff, Mail, RefreshCw, CheckCircle2, Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -14,6 +14,14 @@ import { AuthAPI } from "@/lib/apiClient";
 import { ApiError } from "@/lib/axios";
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
+
+function ResetPasswordContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
