@@ -1,27 +1,60 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useState, Suspense } from "react";
+import { Mail, Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SigninUserDto, signinSchema } from "@/schemas/authSchema";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
 
-
-
-export default function SignInPage() {
+function SignInContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const successMessage = searchParams.get("message");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const { register, handleSubmit, formState: { errors } } = useForm<SigninUserDto>({
+    resolver: zodResolver(signinSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    }
+  });
+
+  const onSubmit = async (data: SigninUserDto) => {
     setError("");
+    router.replace("/sign-in");
     setIsLoading(true);
 
-    // Simulate API call — you'll wire up NextAuth signIn here
-    setTimeout(() => {
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+
+      if (result?.error) {
+        if (result.error === "CredentialsSignin") {
+          setError("Invalid email or password");
+        } else {
+          setError(result.error);
+        }
+        console.log(result.error);
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
       setIsLoading(false);
-      // signIn("credentials", { email: formData.email, password: formData.password })
-    }, 1500);
+    }
   };
 
   return (
@@ -33,91 +66,75 @@ export default function SignInPage() {
         </p>
       </div>
 
+      {successMessage && (
+        <div className="mb-6 p-3 rounded-xl bg-success/10 border border-success/20 text-success text-sm flex items-center gap-2 animate-fade-in">
+          <CheckCircle2 size={16} />
+          {successMessage}
+        </div>
+      )}
+
       {error && (
         <div className="mb-6 p-3 rounded-xl bg-danger/10 border border-danger/20 text-danger text-sm text-center animate-fade-in">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Email */}
-        <div className="space-y-2">
-          <label htmlFor="signin-email" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Email
-          </label>
-          <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted">
-              <Mail size={18} />
-            </span>
-            <input
-              id="signin-email"
-              type="email"
-              required
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full pl-11 pr-4 py-3 rounded-xl bg-input-bg border border-input-border text-foreground placeholder-muted text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all"
-            />
-          </div>
-        </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <Input
+          label="Email"
+          id="signin-email"
+          type="email"
+          placeholder="you@example.com"
+          {...register("email")}
+          error={errors.email?.message}
+          icon={<Mail size={18} />}
+          required
+        />
 
-        {/* Password */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label htmlFor="signin-password" className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Password
             </label>
             <Link
               href="/forgot-password"
               id="signin-forgot-password"
-              className="text-xs text-accent hover:text-accent-hover transition-colors"
+              className="text-xs text-accent hover:text-accent-hover transition-colors font-medium"
             >
               Forgot password?
             </Link>
           </div>
-          <div className="relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted">
-              <Lock size={18} />
-            </span>
-            <input
-              id="signin-password"
-              type={showPassword ? "text" : "password"}
-              required
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full pl-11 pr-12 py-3 rounded-xl bg-input-bg border border-input-border text-foreground placeholder-muted text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted hover:text-foreground transition-colors"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
+          <Input
+            id="signin-password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            {...register("password")}
+            error={errors.password?.message}
+            icon={<Lock size={18} />}
+            required
+            rightIcon={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="hover:text-foreground transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
+          />
         </div>
 
-        {/* Submit */}
-        <button
+        <Button
           type="submit"
           id="signin-submit"
-          disabled={isLoading}
-          className="w-full py-3 rounded-xl bg-linear-to-r from-accent to-purple-400 text-white font-medium text-sm hover:opacity-90 transition-all shadow-lg shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          isLoading={isLoading}
+          loadingText="Signing in..."
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="animate-spin h-5 w-5" />
-              Signing in...
-            </>
-          ) : (
-            "Sign In"
-          )}
-        </button>
+          Sign In
+        </Button>
       </form>
 
-      {/* Divider */}
       <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-card-border" />
@@ -129,7 +146,6 @@ export default function SignInPage() {
         </div>
       </div>
 
-      {/* Sign up link */}
       <Link
         href="/sign-up"
         id="signin-go-to-signup"
@@ -138,5 +154,13 @@ export default function SignInPage() {
         Create an account
       </Link>
     </>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignInContent />
+    </Suspense>
   );
 }

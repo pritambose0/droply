@@ -39,6 +39,7 @@ export default function ResetPasswordPage() {
   const onSubmit = async (data: ResetPasswordDto) => {
     setError("");
     setIsLoading(true);
+    console.log(data);
 
     try {
       await AuthAPI.resetPassword(data);

@@ -52,7 +52,7 @@ export class AuthService {
         }
 
         if (!user.verificationCode) {
-            throw new ApiError(400, "No verification code found");
+            throw new ApiError(400, "Invalid or expired reset code");
         }
 
         if (user.verificationCodeAttempts >= OTP_CONFIG.MAX_ATTEMPTS) {
@@ -84,7 +84,13 @@ export class AuthService {
 
         const user = await UserModel.findOne({ email }).select("+verificationCode +verificationCodeExpiry +verificationCodeAttempts");
 
-        if (!user || user.isVerified) return;
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        if (user.isVerified) {
+            throw new ApiError(400, "User is already verified");
+        }
 
         const otp = generateOTP();
         user.verificationCode = otp;
@@ -141,7 +147,7 @@ export class AuthService {
         }
 
         if (!user.verificationCode) {
-            throw new ApiError(400, "No verification code found");
+            throw new ApiError(400, "Invalid or expired reset code");
         }
 
         if (user.verificationCodeAttempts >= OTP_CONFIG.MAX_ATTEMPTS) {

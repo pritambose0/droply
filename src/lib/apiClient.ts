@@ -6,5 +6,5 @@ export const AuthAPI = {
     verify: (data: VerifyCodeDto): Promise<APIResponse> => axiosInstance.post("/auth/verify", data),
     resendOTP: (data: SendCodeDto): Promise<APIResponse> => axiosInstance.post("/auth/resend-otp", data),
     forgotPassword: (data: SendCodeDto): Promise<APIResponse> => axiosInstance.post("/auth/forgot-password", data),
-    resetPassword: ({ confirmPassword, ...rest }: ResetPasswordDto): Promise<APIResponse> => axiosInstance.post("/auth/reset-password", rest),
+    resetPassword: (data: ResetPasswordDto): Promise<APIResponse> => axiosInstance.post("/auth/reset-password", data),
 };
