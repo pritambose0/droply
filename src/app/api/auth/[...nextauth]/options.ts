@@ -32,14 +32,14 @@ export const authOptions: AuthOptions = {
                     throw new Error("Invalid email or password");
                 }
 
-                if (!user.isVerified) {
-                    throw new Error("Please verify your email before signing in");
-                }
-
                 const isPasswordValid = await user.comparePassword(password);
 
                 if (!isPasswordValid) {
                     throw new Error("Invalid email or password");
+                }
+
+                if (!user.isVerified) {
+                    throw new Error("UNVERIFIED_EMAIL");
                 }
 
                 return {

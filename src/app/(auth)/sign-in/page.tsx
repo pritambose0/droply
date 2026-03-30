@@ -10,16 +10,21 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
+import { AuthAPI } from "@/lib/apiClient";
+import { ApiError } from "@/lib/axios";
 
 function SignInContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showVerifyOptions, setShowVerifyOptions] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
   const successMessage = searchParams.get("message");
 
-  const { register, handleSubmit, formState: { errors } } = useForm<SigninUserDto>({
+  const { register, handleSubmit, getValues, formState: { errors } } = useForm<SigninUserDto>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
       email: "",
@@ -29,6 +34,8 @@ function SignInContent() {
 
   const onSubmit = async (data: SigninUserDto) => {
     setError("");
+    setResendSuccess("");
+    setShowVerifyOptions(false);
     router.replace("/sign-in");
     setIsLoading(true);
 
@@ -42,6 +49,9 @@ function SignInContent() {
       if (result?.error) {
         if (result.error === "CredentialsSignin") {
           setError("Invalid email or password");
+        } else if (result.error === "UNVERIFIED_EMAIL") {
+          setError("Please verify your email before signing in.");
+          setShowVerifyOptions(true);
         } else {
           setError(result.error);
         }
@@ -54,6 +64,26 @@ function SignInContent() {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendEmail = async () => {
+    const email = getValues("email");
+    if (!email) return;
+
+    setIsResending(true);
+    setResendSuccess("");
+    setError("");
+
+    try {
+      await AuthAPI.resendOTP({ email });
+      setResendSuccess("Verification code sent to " + email);
+      router.replace("/verify?email=" + encodeURIComponent(email));
+    } catch (err) {
+      const apiError = err as ApiError;
+      setError(apiError.message || "Failed to resend code");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -73,9 +103,36 @@ function SignInContent() {
         </div>
       )}
 
+      {resendSuccess && (
+        <div className="mb-6 p-3 rounded-xl bg-success/10 border border-success/20 text-success text-sm flex items-center gap-2 animate-fade-in justify-center">
+          <CheckCircle2 size={16} />
+          {resendSuccess}
+        </div>
+      )}
+
       {error && (
         <div className="mb-6 p-3 rounded-xl bg-danger/10 border border-danger/20 text-danger text-sm text-center animate-fade-in">
-          {error}
+          <p>{error}</p>
+          {showVerifyOptions && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <Link
+                href={`/verify?email=${encodeURIComponent(getValues("email"))}`}
+                className="px-4 py-2 rounded-lg bg-danger text-white text-xs font-semibold hover:bg-danger/90 transition-colors"
+                id="signin-verify-btn"
+              >
+                Verify Now
+              </Link>
+              <button
+                type="button"
+                onClick={handleResendEmail}
+                disabled={isResending}
+                className="px-4 py-2 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-colors disabled:opacity-50"
+                id="signin-resend-btn"
+              >
+                {isResending ? "Sending..." : "Resend Email"}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

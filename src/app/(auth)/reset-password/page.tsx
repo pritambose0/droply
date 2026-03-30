@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import OTPInput from "@/components/OTPInput";
 import { AuthAPI } from "@/lib/apiClient";
 import { ApiError } from "@/lib/axios";
+import { useResendTimer } from "@/hooks/useResendTimer";
 
 export default function ResetPasswordPage() {
   return (
@@ -28,9 +29,13 @@ function ResetPasswordContent() {
   const [isResendLoading, setIsResendLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [countdown, setCountdown] = useState(0);
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+
+  const { countdown, startCountdown, clearTimer } = useResendTimer({
+    keyPrefix: "reset_password_expiry",
+    identifier: email,
+  });
 
   const { register, formState: { errors }, handleSubmit, setValue, watch } = useForm<ResetPasswordDto>({
     resolver: zodResolver(resetPasswordSchema),
@@ -47,11 +52,10 @@ function ResetPasswordContent() {
   const onSubmit = async (data: ResetPasswordDto) => {
     setError("");
     setIsLoading(true);
-    console.log(data);
 
     try {
       await AuthAPI.resetPassword(data);
-      localStorage.removeItem(`reset_password_expiry:${email}`);
+      clearTimer();
       setIsSuccess(true);
     } catch (err) {
       const apiError = err as ApiError;
@@ -63,13 +67,6 @@ function ResetPasswordContent() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const startCountdown = (seconds: number) => {
-    if (!email) return;
-    const expiry = Date.now() + seconds * 1000;
-    localStorage.setItem(`reset_password_expiry:${email}`, expiry.toString());
-    setCountdown(seconds);
   };
 
   const handleResendCode = async () => {
@@ -84,7 +81,7 @@ function ResetPasswordContent() {
       startCountdown(60);
     } catch (err) {
       const apiError = err as ApiError;
-      setError(apiError.message);
+      setError(apiError.message || "Failed to resend code");
     } finally {
       setIsResendLoading(false);
     }
@@ -95,27 +92,6 @@ function ResetPasswordContent() {
       setValue("email", email, { shouldValidate: true });
     }
   }, [email, setValue]);
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
-
-  useEffect(() => {
-    if (!email) return;
-
-    const storedExpiry = localStorage.getItem(`reset_password_expiry:${email}`);
-    if (storedExpiry) {
-      const remainingTime = Math.round((parseInt(storedExpiry) - Date.now()) / 1000);
-      if (remainingTime > 0) {
-        setCountdown(remainingTime);
-      } else {
-        localStorage.removeItem(`reset_password_expiry:${email}`);
-      }
-    }
-  }, [email]);
 
   if (isSuccess) {
     return (
@@ -202,7 +178,7 @@ function ResetPasswordContent() {
               >
                 {isResendLoading ? (
                   <span className="flex items-center gap-1.5 justify-center">
-                    <Loader2 size={14} className="animate-spin" /> Resending...
+                    Resending...
                   </span>
                 ) : (
                   "Resend code"

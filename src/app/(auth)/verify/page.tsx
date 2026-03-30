@@ -8,16 +8,21 @@ import { AuthAPI } from "@/lib/apiClient";
 import OTPInput from "@/components/OTPInput";
 import Button from "@/components/Button";
 import { ApiError } from "@/lib/axios";
+import { useResendTimer } from "@/hooks/useResendTimer";
 
 function VerifyContent() {
     const [otp, setOtp] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isResending, setIsResending] = useState(false);
     const [error, setError] = useState("");
-    const [countdown, setCountdown] = useState(0);
     const searchParams = useSearchParams();
     const router = useRouter();
     const email = searchParams.get("email");
+
+    const { countdown, startCountdown, clearTimer } = useResendTimer({
+        keyPrefix: "verify_expiry",
+        identifier: email,
+    });
 
     useEffect(() => {
         if (!email) {
@@ -25,14 +30,8 @@ function VerifyContent() {
         }
     }, [email, router]);
 
-    useEffect(() => {
-        if (countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [countdown]);
-
-    const handleSubmit = async () => {
+    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+        e.preventDefault();
         if (!email) return;
 
         if (otp.length !== 6) {
@@ -45,6 +44,7 @@ function VerifyContent() {
 
         try {
             await AuthAPI.verify({ email, code: otp });
+            clearTimer();
             router.push("/sign-in?message=Email verified successfully. Please sign in.");
         } catch (err) {
             const apiError = err as ApiError;
@@ -55,14 +55,15 @@ function VerifyContent() {
     };
 
     const handleResend = async () => {
-        if (!email || countdown > 0 || isResending) return;
+        if (!email) return setError("Email is required to resend code.");
+        if (countdown > 0 || isResending) return;
 
         setIsResending(true);
         setError("");
 
         try {
             await AuthAPI.resendOTP({ email });
-            setCountdown(60);
+            startCountdown(60);
         } catch (err) {
             const apiError = err as ApiError;
             setError(apiError.message || "Failed to resend code");
