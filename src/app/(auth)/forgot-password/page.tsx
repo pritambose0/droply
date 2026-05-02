@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 ">
         <Input
           id="forgot-email"
           type="email"
@@ -102,14 +102,17 @@ export default function ForgotPasswordPage() {
           error={errors.email?.message}
         />
 
-        <Button
-          type="submit"
-          id="forgot-submit"
-          isLoading={isLoading}
-          loadingText="Sending..."
-        >
-          Send Reset Code
-        </Button>
+        <div className="flex justify-center w-full">
+          <Button
+            type="submit"
+            id="forgot-submit"
+            disabled={isLoading || !getValues("email")}
+            isLoading={isLoading}
+            loadingText="Sending..."
+          >
+            Send Reset Code
+          </Button>
+        </div>
       </form >
 
       <div className="mt-6 text-center">

@@ -23,7 +23,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <button
                 ref={ref}
                 className={twMerge(
-                    "w-full py-3 rounded-xl font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer",
+                    "inline-flex items-center justify-center gap-2 rounded-xl font-medium text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer py-3 px-6",
                     variant !== "none" && (variants[variant as keyof typeof variants] || variants.primary),
                     className
                 )}

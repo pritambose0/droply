@@ -155,9 +155,9 @@ function SignInContent() {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Password
-            </label>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Password {<span className="text-red-500">*</span>}
+            </span>
             <Link
               href="/forgot-password"
               id="signin-forgot-password"
@@ -175,14 +175,15 @@ function SignInContent() {
             icon={<Lock size={18} />}
             required
             rightIcon={
-              <button
+              <Button
                 type="button"
+                variant="none"
                 onClick={() => setShowPassword(!showPassword)}
-                className="hover:text-foreground transition-colors"
+                className="p-0 m-0 w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+              </Button>
             }
           />
         </div>
@@ -190,6 +191,7 @@ function SignInContent() {
         <Button
           type="submit"
           id="signin-submit"
+          className="w-full"
           isLoading={isLoading}
           loadingText="Signing in..."
         >

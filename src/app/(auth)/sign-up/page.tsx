@@ -136,14 +136,15 @@ export default function SignUpPage() {
             icon={<Lock size={18} />}
             required
             rightIcon={
-              <button
+              <Button
                 type="button"
+                variant="none"
                 onClick={() => setShowPassword(!showPassword)}
-                className="hover:text-foreground transition-colors"
+                className="p-0 m-0 w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+              </Button>
             }
           />
 
@@ -170,6 +171,7 @@ export default function SignUpPage() {
         <Button
           type="submit"
           id="signup-submit"
+          className="w-full"
           isLoading={isLoading}
           loadingText="Creating account..."
         >

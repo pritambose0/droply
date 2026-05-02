@@ -94,7 +94,7 @@ function VerifyContent() {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 flex flex-col items-center justify-center">
                 <OTPInput
                     value={otp}
                     onChange={(val) => {
@@ -120,13 +120,14 @@ function VerifyContent() {
                     {countdown > 0 ? (
                         <span className="text-accent font-medium">Resend in {countdown}s</span>
                     ) : (
-                        <button
+                        <Button
                             onClick={handleResend}
+                            variant="none"
                             disabled={isResending}
-                            className="text-accent hover:text-accent-hover transition-colors font-medium cursor-pointer"
+                            className="p-0 m-0 text-accent hover:text-accent-hover transition-colors font-medium cursor-pointer"
                         >
                             {isResending ? "Sending..." : "Resend"}
-                        </button>
+                        </Button>
                     )}
                 </p>
             </div>

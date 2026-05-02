@@ -1,4 +1,5 @@
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -6,9 +7,14 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     icon?: React.ReactNode;
     rightIcon?: React.ReactNode;
     containerClassName?: string;
+    labelClassName?: string;
+    required?: boolean;
+    variant?: "default" | "dashboard";
+    as?: "input" | "textarea";
+    rows?: number;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
+const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
     (
         {
             label,
@@ -17,53 +23,77 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             rightIcon,
             className,
             containerClassName,
+            labelClassName,
             id,
+            required,
+            variant = "default",
+            as = "input",
+            rows,
             ...props
         },
         ref
     ) => {
-        return (
-            <div className={`space-y-2 ${containerClassName}`}>
+        const labelStyles = {
+            default: "text-xs font-medium text-muted-foreground uppercase tracking-wider",
+            dashboard: "text-sm font-medium text-foreground"
+        };
 
+        const inputStyles = {
+            default: "py-3 bg-input-bg border-input-border focus:ring-2 focus:ring-input-focus",
+            dashboard: "py-2.5 bg-surface border-input-border focus:ring-1 focus:ring-accent"
+        };
+
+        const commonClasses = twMerge(
+            "w-full px-4 rounded-xl border text-foreground placeholder:text-muted-foreground/50 text-sm focus:outline-none transition-all",
+            inputStyles[variant],
+            icon && "pl-11",
+            rightIcon && "pr-11",
+            error && "border-red-500",
+            className
+        );
+
+        return (
+            <div className={twMerge("space-y-2", containerClassName)}>
                 {/* Label */}
                 {label && (
                     <label
                         htmlFor={id}
-                        className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                        className={twMerge(labelStyles[variant], labelClassName)}
                     >
-                        {label}
+                        {label} {required && <span className="text-red-500">*</span>}
                     </label>
                 )}
 
                 {/* Input Wrapper */}
                 <div className="relative">
-
                     {/* Left Icon */}
                     {icon && (
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
                             {icon}
                         </span>
                     )}
 
-                    {/* Input */}
-                    <input
-                        ref={ref}
-                        id={id}
-                        className={`
-                        w-full py-3 rounded-xl bg-input-bg border text-foreground placeholder-muted text-sm
-                        focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all
-                        ${icon ? "pl-11" : "pl-4"}
-                        ${rightIcon ? "pr-11" : "pr-4"}
-                        ${error ? "border-red-500" : "border-input-border"}
-                        ${className}
-                        placeholder:text-white/20
-                        `}
-                        {...props}
-                    />
+                    {/* Input or Textarea */}
+                    {as === "textarea" ? (
+                        <textarea
+                            ref={ref as React.RefObject<HTMLTextAreaElement>}
+                            id={id}
+                            rows={rows}
+                            className={twMerge(commonClasses, "resize-y min-h-[120px] py-3")}
+                            {...(props as TextareaHTMLAttributes<HTMLTextAreaElement>)}
+                        />
+                    ) : (
+                        <input
+                            ref={ref as React.RefObject<HTMLInputElement>}
+                            id={id}
+                            className={commonClasses}
+                            {...(props as InputHTMLAttributes<HTMLInputElement>)}
+                        />
+                    )}
 
                     {/* Right Icon */}
                     {rightIcon && (
-                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted">
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
                             {rightIcon}
                         </span>
                     )}
@@ -71,7 +101,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
                 {/* Error */}
                 {error && (
-                    <p className="text-red-500 text-xs">{error}</p>
+                    <p className="text-red-500 text-xs mt-1">{error}</p>
                 )}
             </div>
         );
