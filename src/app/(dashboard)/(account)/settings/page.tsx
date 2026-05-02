@@ -1,234 +1,299 @@
 "use client";
 
 import { useState } from "react";
+import { Camera, Shield, Bell, Moon, Sun, Monitor, Globe, Download, Trash2, Smartphone, Mail, GitBranchPlusIcon, Key } from "lucide-react";
 
-function UserIcon() {
+// --- Reusable UI Components ---
+
+function SettingsSectionCard({ title, description, children, icon: Icon }: { title: string, description?: string, children: React.ReactNode, icon?: any }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 01-3.46 0" />
-    </svg>
-  );
-}
-
-function ShieldIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  );
-}
-
-export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<"profile" | "notifications" | "security">("profile");
-
-  // Profile State
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("johndoe@example.com");
-  const [bio, setBio] = useState("Digital creator & designer based in San Francisco.");
-
-  // Notification State
-  const [emailNotifs, setEmailNotifs] = useState({
-    orderUpdates: true,
-    promotions: false,
-    newProducts: true,
-  });
-
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage your account settings and preferences.
-        </p>
+    <div className="glass rounded-2xl overflow-hidden border border-card-border/60">
+      <div className="p-6 md:p-8 border-b border-card-border/40">
+        <div className="flex items-start gap-4">
+          {Icon && (
+            <div className="p-3 rounded-xl bg-surface border border-card-border/50 text-accent shrink-0">
+              <Icon size={20} />
+            </div>
+          )}
+          <div>
+            <h2 className="text-xl font-semibold text-foreground mb-1">{title}</h2>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
+          </div>
+        </div>
       </div>
+      <div className="p-6 md:p-8 space-y-6">
+        {children}
+      </div>
+    </div>
+  );
+}
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Nav */}
-        <div className="w-full md:w-64 shrink-0">
-          <nav className="flex md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0">
-            <button
-              onClick={() => setActiveTab("profile")}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === "profile"
-                ? "bg-accent/10 text-accent border border-accent/20"
-                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
-                }`}
-            >
-              <UserIcon /> Profile
-            </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === "notifications"
-                ? "bg-accent/10 text-accent border border-accent/20"
-                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
-                }`}
-            >
-              <BellIcon /> Notifications
-            </button>
-            <button
-              onClick={() => setActiveTab("security")}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${activeTab === "security"
-                ? "bg-accent/10 text-accent border border-accent/20"
-                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
-                }`}
-            >
-              <ShieldIcon /> Security
-            </button>
-          </nav>
+function ToggleRow({ title, description, checked, onChange }: { title: string, description?: string, checked: boolean, onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-2">
+      <div>
+        <h3 className="text-sm font-medium text-foreground">{title}</h3>
+        {description && <p className="text-sm text-muted-foreground mt-0.5">{description}</p>}
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background ${checked ? 'bg-accent' : 'bg-surface border-card-border/80'}`}
+      >
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${checked ? 'translate-x-5' : 'translate-x-0'}`}
+        />
+      </button>
+    </div>
+  );
+}
+
+function InputField({ label, type = "text", placeholder, defaultValue, readOnly }: any) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-foreground">{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+        readOnly={readOnly}
+        className={`w-full px-4 py-2.5 rounded-xl border border-card-border bg-surface text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-shadow ${readOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+      />
+    </div>
+  );
+}
+
+function AvatarUploader() {
+  return (
+    <div className="flex flex-col items-center gap-3 shrink-0">
+      <div className="relative w-24 h-24 rounded-full bg-surface border border-card-border overflow-hidden group cursor-pointer">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <Camera className="text-white" size={24} />
+        </div>
+        {/* Mock Image Placeholder */}
+        <div className="w-full h-full bg-linear-to-br from-accent/40 to-purple-500/40" />
+      </div>
+      <span className="text-xs font-medium text-muted-foreground uppercase tracking-widest">Avatar</span>
+    </div>
+  );
+}
+
+function DangerZoneCard() {
+  return (
+    <div className="glass rounded-2xl overflow-hidden border border-red-500/20">
+      <div className="p-6 md:p-8 space-y-8">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground mb-1">Privacy & Data</h2>
+          <p className="text-sm text-muted-foreground">Manage your personal data and account status.</p>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 glass rounded-2xl p-6 md:p-8 animate-fade-in text-left">
+        <div className="flex items-center justify-between p-4 rounded-xl border border-card-border bg-surface/50">
+          <div>
+            <h3 className="text-sm font-medium text-foreground">Export Data</h3>
+            <p className="text-xs text-muted-foreground mt-1">Download a copy of all your data associated with this account.</p>
+          </div>
+          <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-card-border bg-surface text-sm font-medium hover:bg-surface-hover transition-colors">
+            <Download size={16} />
+            Request Export
+          </button>
+        </div>
 
-          {/* Profile Settings */}
-          {activeTab === "profile" && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Public Profile</h2>
+        <div className="p-5 rounded-xl border border-red-500/30 bg-red-500/5">
+          <h3 className="text-sm font-medium text-red-400 mb-2">Danger Zone</h3>
+          <p className="text-sm text-muted-foreground mb-4">Permanently delete your account and all associated data. This action cannot be undone.</p>
+          <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-red-500/10 text-red-400 text-sm font-medium hover:bg-red-500 hover:text-white transition-colors border border-red-500/20">
+            <Trash2 size={16} />
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-              <div className="flex items-center gap-6 mb-8">
-                <div className="w-20 h-20 rounded-full bg-linear-to-br from-accent to-purple-400 flex flex-col items-center justify-center text-xl font-bold text-white shadow-xl shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
-                  JD
+// --- Main Page Component ---
+
+export default function GlobalSettingsPage() {
+  const [tfaEnabled, setTfaEnabled] = useState(false);
+  const [emailNotifs, setEmailNotifs] = useState(true);
+  const [marketingNotifs, setMarketingNotifs] = useState(false);
+  const [theme, setTheme] = useState('system');
+
+  return (
+    <div className="min-h-screen pt-32 pb-24 px-6">
+      <div className="max-w-4xl mx-auto space-y-10 animate-fade-in-up">
+
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-2">Account Settings</h1>
+          <p className="text-lg text-muted-foreground">Manage your personal account preferences and security.</p>
+        </div>
+
+        <div className="space-y-8">
+
+          {/* Profile Basics */}
+          <SettingsSectionCard
+            title="Profile Basics"
+            description="Update your personal details and public profile."
+            icon={Globe}
+          >
+            <div className="flex flex-col sm:flex-row gap-8 items-start">
+              <AvatarUploader />
+
+              <div className="flex-1 space-y-5 w-full">
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <InputField label="Full Name" defaultValue="Alex Developer" />
+                  <InputField label="Username" defaultValue="@alexdev" />
                 </div>
-                <div>
-                  <button className="px-4 py-2 bg-surface text-sm font-medium rounded-xl hover:bg-surface-hover transition-colors text-foreground mb-2">
-                    Change Avatar
+                <InputField label="Email Address" type="email" defaultValue="alex@example.com" readOnly />
+                <div className="pt-2 flex justify-end">
+                  <button className="px-6 py-2.5 rounded-xl bg-linear-to-r from-accent to-purple-400 text-white font-medium hover:opacity-90 transition-opacity shadow-lg shadow-accent/20">
+                    Save Changes
                   </button>
-                  <p className="text-xs text-muted-foreground">JPG, GIF or PNG. 1MB max.</p>
                 </div>
               </div>
+            </div>
+          </SettingsSectionCard>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all"
-                  />
+          {/* Security */}
+          <SettingsSectionCard
+            title="Security & Authentication"
+            description="Keep your account secure and monitor active sessions."
+            icon={Shield}
+          >
+            <div className="space-y-8">
+              <div className="flex items-center justify-between border-b border-card-border/50 pb-6">
+                <div>
+                  <h3 className="text-sm font-medium text-foreground">Password</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Change your password regularly to keep your account secure.</p>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email Address</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all"
-                  />
-                </div>
-                <div className="col-span-1 md:col-span-2 space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Bio</label>
-                  <textarea
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground">Brief description for your profile.</p>
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <button className="px-6 py-2.5 bg-linear-to-r from-accent to-purple-400 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-accent/20">
-                  Save Changes
+                <button className="px-4 py-2 rounded-lg border border-card-border bg-surface text-sm font-medium hover:bg-surface-hover transition-colors">
+                  Change Password
                 </button>
               </div>
-            </div>
-          )}
 
-          {/* Notifications Settings */}
-          {activeTab === "notifications" && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Email Notifications</h2>
-              <p className="text-sm text-muted-foreground mb-6">Choose what type of emails you want to receive.</p>
+              <ToggleRow
+                title="Two-Factor Authentication (2FA)"
+                description="Add an extra layer of security to your account."
+                checked={tfaEnabled}
+                onChange={setTfaEnabled}
+              />
 
-              <div className="space-y-4">
-                {/* Toggle 1 */}
-                <div className="flex items-center justify-between p-4 rounded-xl border border-card-border bg-surface">
-                  <div>
-                    <h3 className="text-sm font-medium text-foreground">Order Updates</h3>
-                    <p className="text-xs text-muted-foreground">Receive emails when your orders are processed.</p>
+              <div className="pt-4">
+                <h3 className="text-sm font-medium text-foreground mb-4">Active Sessions</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-card-border/50 bg-surface/50">
+                    <div className="flex items-center gap-4">
+                      <Monitor className="text-muted-foreground" size={20} />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">MacBook Pro 16"</p>
+                        <p className="text-xs text-muted-foreground">San Francisco, CA • Current Session</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-green-500 bg-green-500/10 px-2.5 py-1 rounded-full">Active</span>
                   </div>
-                  <button
-                    onClick={() => setEmailNotifs({ ...emailNotifs, orderUpdates: !emailNotifs.orderUpdates })}
-                    className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.orderUpdates ? 'bg-accent' : 'bg-surface-hover'}`}
-                  >
-                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.orderUpdates ? 'left-6' : 'left-1'}`} />
-                  </button>
-                </div>
-
-                {/* Toggle 2 */}
-                <div className="flex items-center justify-between p-4 rounded-xl border border-card-border bg-surface">
-                  <div>
-                    <h3 className="text-sm font-medium text-foreground">Promotions</h3>
-                    <p className="text-xs text-muted-foreground">Receive exclusive offers and promotional news.</p>
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-card-border/50 bg-surface/50">
+                    <div className="flex items-center gap-4">
+                      <Smartphone className="text-muted-foreground" size={20} />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">iPhone 14 Pro</p>
+                        <p className="text-xs text-muted-foreground">San Francisco, CA • 2 hours ago</p>
+                      </div>
+                    </div>
+                    <button className="text-xs font-medium text-muted-foreground hover:text-red-400 transition-colors">Log out</button>
                   </div>
-                  <button
-                    onClick={() => setEmailNotifs({ ...emailNotifs, promotions: !emailNotifs.promotions })}
-                    className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.promotions ? 'bg-accent' : 'bg-surface-hover'}`}
-                  >
-                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.promotions ? 'left-6' : 'left-1'}`} />
-                  </button>
-                </div>
-
-                {/* Toggle 3 */}
-                <div className="flex items-center justify-between p-4 rounded-xl border border-card-border bg-surface">
-                  <div>
-                    <h3 className="text-sm font-medium text-foreground">New Products</h3>
-                    <p className="text-xs text-muted-foreground">Get notified when creators you follow post new items.</p>
-                  </div>
-                  <button
-                    onClick={() => setEmailNotifs({ ...emailNotifs, newProducts: !emailNotifs.newProducts })}
-                    className={`w-11 h-6 rounded-full transition-colors relative ${emailNotifs.newProducts ? 'bg-accent' : 'bg-surface-hover'}`}
-                  >
-                    <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${emailNotifs.newProducts ? 'left-6' : 'left-1'}`} />
-                  </button>
                 </div>
               </div>
             </div>
-          )}
+          </SettingsSectionCard>
 
-          {/* Security Settings */}
-          {activeTab === "security" && (
+          {/* Connected Accounts */}
+          <SettingsSectionCard
+            title="Connected Accounts"
+            description="Manage your linked social accounts for faster login."
+            icon={Key}
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-card-border/50">
+                <div className="flex items-center gap-3">
+                  <Mail className="text-muted-foreground" size={20} />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Google</p>
+                    <p className="text-xs text-muted-foreground">Connected as alex@example.com</p>
+                  </div>
+                </div>
+                <button className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg border border-card-border">Disconnect</button>
+              </div>
+              <div className="flex items-center justify-between p-4 rounded-xl border border-card-border/50">
+                <div className="flex items-center gap-3">
+                  <GitBranchPlusIcon className="text-muted-foreground" size={20} />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">GitHub</p>
+                    <p className="text-xs text-muted-foreground">Not connected</p>
+                  </div>
+                </div>
+                <button className="text-xs font-medium text-foreground bg-surface hover:bg-surface-hover transition-colors px-3 py-1.5 rounded-lg border border-card-border">Connect</button>
+              </div>
+            </div>
+          </SettingsSectionCard>
+
+          {/* Preferences */}
+          <SettingsSectionCard
+            title="Preferences"
+            description="Customize your Droply experience."
+            icon={Bell}
+          >
             <div className="space-y-8">
               <div>
-                <h2 className="text-lg font-semibold text-foreground mb-4">Change Password</h2>
-                <div className="space-y-4 max-w-sm">
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Current Password</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">New Password</label>
-                    <input type="password" placeholder="••••••••" className="w-full px-4 py-2.5 rounded-xl bg-input-bg border border-input-border text-foreground text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-input-focus transition-all" />
-                  </div>
-                  <button className="px-6 py-2.5 bg-surface text-foreground text-sm font-medium rounded-xl hover:bg-surface-hover transition-colors">
-                    Update Password
+                <h3 className="text-sm font-medium text-foreground mb-3">Theme</h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <button onClick={() => setTheme('light')} className={`flex flex-col items-center gap-2 p-4 rounded-xl border ${theme === 'light' ? 'border-accent bg-accent/5' : 'border-card-border bg-surface'} hover:border-accent/50 transition-colors`}>
+                    <Sun size={20} className={theme === 'light' ? 'text-accent' : 'text-muted-foreground'} />
+                    <span className="text-sm font-medium">Light</span>
+                  </button>
+                  <button onClick={() => setTheme('dark')} className={`flex flex-col items-center gap-2 p-4 rounded-xl border ${theme === 'dark' ? 'border-accent bg-accent/5' : 'border-card-border bg-surface'} hover:border-accent/50 transition-colors`}>
+                    <Moon size={20} className={theme === 'dark' ? 'text-accent' : 'text-muted-foreground'} />
+                    <span className="text-sm font-medium">Dark</span>
+                  </button>
+                  <button onClick={() => setTheme('system')} className={`flex flex-col items-center gap-2 p-4 rounded-xl border ${theme === 'system' ? 'border-accent bg-accent/5' : 'border-card-border bg-surface'} hover:border-accent/50 transition-colors`}>
+                    <Monitor size={20} className={theme === 'system' ? 'text-accent' : 'text-muted-foreground'} />
+                    <span className="text-sm font-medium">System</span>
                   </button>
                 </div>
               </div>
 
-              <div className="h-px w-full bg-card-border" />
+              <div className="space-y-4 pt-4 border-t border-card-border/50">
+                <ToggleRow
+                  title="Email Notifications"
+                  description="Receive updates about your account and purchases."
+                  checked={emailNotifs}
+                  onChange={setEmailNotifs}
+                />
+                <ToggleRow
+                  title="Marketing Emails"
+                  description="Receive news, updates, and promotional content."
+                  checked={marketingNotifs}
+                  onChange={setMarketingNotifs}
+                />
+              </div>
 
-              <div>
-                <h2 className="text-lg font-semibold text-danger mb-2">Danger Zone</h2>
-                <p className="text-sm text-muted-foreground mb-4">Once you delete your account, there is no going back. Please be certain.</p>
-                <button className="px-6 py-2.5 bg-danger/10 text-danger border border-danger/20 text-sm font-medium rounded-xl hover:bg-danger hover:text-white transition-all">
-                  Delete Account
-                </button>
+              <div className="pt-4 border-t border-card-border/50">
+                <label className="text-sm font-medium text-foreground block mb-2">Language</label>
+                <select className="w-full md:w-1/2 px-4 py-2.5 rounded-xl border border-card-border bg-surface text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
+                  <option value="en">English (US)</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                </select>
               </div>
             </div>
-          )}
+          </SettingsSectionCard>
+
+          {/* Privacy & Danger Zone */}
+          <DangerZoneCard />
 
         </div>
       </div>
