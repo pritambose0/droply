@@ -1,65 +1,12 @@
-function ShieldIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      <path d="M9 12l2 2 4-4" />
-    </svg>
-  );
-}
-
-function ZapIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  );
-}
-
-function PackageIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-      <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-      <line x1="12" y1="22.08" x2="12" y2="12" />
-    </svg>
-  );
-}
-
-function DownloadIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
-    </svg>
-  );
-}
-
-function BarChartIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="20" x2="12" y2="10" />
-      <line x1="18" y1="20" x2="18" y2="4" />
-      <line x1="6" y1="20" x2="6" y2="16" />
-    </svg>
-  );
-}
-
-function GlobeIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-      <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-    </svg>
-  );
-}
+import { ShieldCheck, Package, Download, Zap, BarChart3, Globe } from "lucide-react";
 
 function FeatureCard({
-  icon,
+  icon: Icon,
   title,
   description,
   delay,
 }: {
-  icon: React.ReactNode;
+  icon: any;
   title: string;
   description: string;
   delay: string;
@@ -69,7 +16,7 @@ function FeatureCard({
       className={`group glass rounded-2xl p-6 hover:border-accent/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 opacity-0 animate-fade-in-up ${delay}`}
     >
       <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center text-accent mb-4 group-hover:scale-110 transition-transform duration-300">
-        {icon}
+        <Icon size={24} strokeWidth={1.5} />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
@@ -86,7 +33,7 @@ export default function AboutPage() {
             About Droply
           </span>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
-            Empowering creators to build <br/>
+            Empowering creators to build <br />
             <span className="gradient-text">sustainable businesses</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -107,37 +54,37 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
-              icon={<ShieldIcon />}
+              icon={ShieldCheck}
               title="Secure Authentication"
               description="JWT-based auth with email verification, OTP codes, rate limiting, and password reset — all production-hardened."
               delay="delay-100"
             />
             <FeatureCard
-              icon={<PackageIcon />}
+              icon={Package}
               title="Product Management"
               description="Full CRUD with search, sorting, pagination, draft/published status, tag support, and multi-currency pricing."
               delay="delay-200"
             />
             <FeatureCard
-              icon={<DownloadIcon />}
+              icon={Download}
               title="Secure Downloads"
               description="File URLs are hidden from public APIs. Only paid buyers get download access after successful payment."
               delay="delay-300"
             />
             <FeatureCard
-              icon={<ZapIcon />}
+              icon={Zap}
               title="Instant Order Processing"
               description="Automatic price capture, duplicate prevention, self-purchase blocking, and real-time status tracking."
               delay="delay-100"
             />
             <FeatureCard
-              icon={<BarChartIcon />}
+              icon={BarChart3}
               title="Sales Analytics"
               description="Track sales per product, view order history, and monitor payment statuses from your dashboard."
               delay="delay-200"
             />
             <FeatureCard
-              icon={<GlobeIcon />}
+              icon={Globe}
               title="Multi-Currency"
               description="Accept payments in USD, EUR, GBP, and INR. Set your price in any supported currency."
               delay="delay-300"

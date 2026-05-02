@@ -1,14 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
-function CheckIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 8.5l3 3 7-7" />
-    </svg>
-  );
-}
+import { Check } from "lucide-react";
 
 export default function PricingPage() {
   return (
@@ -45,7 +38,7 @@ export default function PricingPage() {
                 "Full order history",
               ].map((f) => (
                 <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <span className="text-success flex-shrink-0"><CheckIcon /></span>
+                  <span className="text-success flex-shrink-0"><Check size={16} /></span>
                   {f}
                 </div>
               ))}
@@ -84,7 +77,7 @@ export default function PricingPage() {
                 "Custom tags for discovery",
               ].map((f) => (
                 <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <span className="text-accent flex-shrink-0"><CheckIcon /></span>
+                  <span className="text-accent flex-shrink-0"><Check size={16} /></span>
                   {f}
                 </div>
               ))}

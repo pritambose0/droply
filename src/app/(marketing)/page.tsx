@@ -1,164 +1,158 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, Globe, Star } from "lucide-react";
 
+const FEATURES = [
+  {
+    icon: Zap,
+    title: "Instant Delivery",
+    desc: "Secure file delivery happens automatically after purchase. No manual fulfilment needed.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Secure Payments",
+    desc: "Every transaction is encrypted and protected. Buyers get lifetime access to their purchases.",
+  },
+  {
+    icon: Globe,
+    title: "Global Marketplace",
+    desc: "Reach buyers worldwide. Multi-currency support with automated payouts to your bank.",
+  },
+];
 
-
-function Counter({ end, suffix = "", label }: { end: number; suffix?: string; label: string }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const duration = 2000;
-    const step = Math.ceil(end / (duration / 16));
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= end) {
-        setCount(end);
-        clearInterval(timer);
-      } else {
-        setCount(start);
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [end]);
-
-  return (
-    <div className="text-center">
-      <div className="text-3xl md:text-4xl font-bold gradient-text">
-        {count.toLocaleString()}{suffix}
-      </div>
-      <div className="text-sm text-muted-foreground mt-1">{label}</div>
-    </div>
-  );
-}
+const TESTIMONIALS: any[] = [];
 
 export default function HomePage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative pt-40 pb-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative pt-40 pb-28 px-6 overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-accent/8 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-muted-foreground mb-8 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass text-xs font-medium text-muted-foreground mb-8 animate-fade-in border border-card-border">
             <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            Now supporting multi-currency — USD, EUR, GBP, INR
+            The digital marketplace for modern creators
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6 opacity-0 animate-fade-in-up">
-            Sell your digital
+          <h1 className="text-5xl md:text-[72px] font-bold tracking-tight leading-[1.08] mb-6 animate-fade-in-up">
+            Sell your work.
             <br />
-            <span className="gradient-text">products effortlessly</span>
+            <span className="gradient-text">Keep what you earn.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed opacity-0 animate-fade-in-up delay-200">
-            The all-in-one marketplace for creators to list, sell, and deliver
-            digital products — with secure downloads, instant payments, and a
-            beautiful storefront.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed animate-fade-in-up delay-100">
+            Droply is the cleanest way for creators to sell digital products —
+            templates, code, ebooks, and more. Start free, no credit card required.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 animate-fade-in-up delay-300">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up delay-200">
             <Link
               href="/sign-up"
               id="hero-get-started"
-              className="group flex items-center gap-2 px-8 py-3.5 rounded-full bg-linear-to-r from-accent to-purple-400 text-white font-medium text-base hover:opacity-90 transition-all shadow-xl shadow-accent/25 hover:shadow-accent/40 hover:scale-[1.02]"
+              className="group flex items-center gap-2 px-7 py-3.5 rounded-full bg-accent text-white font-semibold text-sm hover:bg-accent-hover transition-all shadow-xl shadow-accent/20"
             >
               Start Selling Free
-              <span className="group-hover:translate-x-1 transition-transform">
-                <ArrowRight />
-              </span>
+              <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
-              href="/about"
-              id="hero-learn-more"
-              className="flex items-center gap-2 px-8 py-3.5 rounded-full glass text-foreground font-medium text-base hover:bg-surface-hover transition-all"
+              href="/discover"
+              id="hero-browse"
+              className="flex items-center gap-2 px-7 py-3.5 rounded-full glass text-foreground font-medium text-sm hover:bg-surface-hover transition-all"
             >
-              Learn More
+              Browse Products
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto opacity-0 animate-fade-in-up delay-500">
-            <Counter end={2400} suffix="+" label="Creators" />
-            <Counter end={18000} suffix="+" label="Products" />
-            <Counter end={99} suffix="%" label="Uptime" />
-          </div>
+          {/* Stats strip removed for MVP clean-up */}
         </div>
       </section>
 
-      {/* ── How It Works ── */}
-      <section id="how-it-works" className="py-24 px-6 border-t border-card-border/50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-xs font-semibold uppercase tracking-widest text-accent mb-3 block">
-              How it works
+      {/* ── Feature Cards ── */}
+      <section className="py-24 px-6 border-t border-card-border/40">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">
+              Why Droply
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              Three steps to{" "}
-              <span className="gradient-text">start earning</span>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+              Everything you need to sell digital products
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                step: "01",
-                title: "Create Account",
-                desc: "Sign up as a Creator or Buyer. Verify your email with a secure 6-digit code.",
-              },
-              {
-                step: "02",
-                title: "List Products",
-                desc: "Upload your digital products with thumbnails, tags, and pricing. Publish when ready.",
-              },
-              {
-                step: "03",
-                title: "Start Selling",
-                desc: "Buyers discover and purchase your products. Secure file delivery happens automatically.",
-              },
-            ].map((item, i) => (
+          <div className="grid md:grid-cols-3 gap-6">
+            {FEATURES.map((f, i) => (
               <div
-                key={i}
-                className={`relative glass rounded-2xl p-8 text-center group hover:-translate-y-1 transition-all duration-500 opacity-0 animate-fade-in-up delay-${(i + 1) * 100}`}
+                key={f.title}
+                className={`glass rounded-2xl p-8 group hover:-translate-y-1 transition-all duration-300 animate-fade-in-up delay-${(i + 1) * 100}`}
               >
-                <div className="text-5xl font-black gradient-text opacity-30 mb-4">
-                  {item.step}
+                <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center text-accent mb-5 group-hover:scale-110 transition-transform shadow-inner shadow-accent/5">
+                  <f.icon size={22} strokeWidth={1.5} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {item.desc}
-                </p>
+                <h3 className="text-base font-bold text-foreground mb-2">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA ── */}
-      <section className="py-24 px-6 border-t border-card-border/50">
+      {/* ── How it works ── */}
+      <section className="py-24 px-6 border-t border-card-border/40">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="glass rounded-3xl p-12 md:p-16 relative overflow-hidden">
-            <div className="absolute inset-0 bg-linear-to-br from-accent/10 to-purple-500/10 pointer-events-none" />
+          <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">
+            Get started
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-14">
+            Up and running in minutes
+          </h2>
+
+          <div className="space-y-4">
+            {[
+              { step: "01", title: "Create your account", desc: "Sign up as a Creator for free. No credit card required." },
+              { step: "02", title: "Upload your product", desc: "Add a title, price, thumbnail, and delivery file. Publish instantly." },
+              { step: "03", title: "Get paid", desc: "Buyers purchase securely. Files deliver automatically. You earn." },
+            ].map((item) => (
+              <div key={item.step} className="flex items-start gap-5 glass rounded-2xl p-6 text-left hover:border-accent/20 transition-all group">
+                <span className="text-2xl font-black gradient-text opacity-40 shrink-0 group-hover:opacity-70 transition-opacity w-10">
+                  {item.step}
+                </span>
+                <div>
+                  <h3 className="text-base font-bold text-foreground mb-1">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof section removed for MVP clean-up */}
+
+      {/* ── CTA Banner ── */}
+      <section className="py-24 px-6 border-t border-card-border/40">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="glass rounded-3xl p-12 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-purple-500/5 pointer-events-none" />
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                Ready to launch your{" "}
+                Ready to launch your
+                <br />
                 <span className="gradient-text">digital store?</span>
               </h2>
-              <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                Join thousands of creators selling digital products on Droply.
-                Setup takes less than a minute.
+              <p className="text-muted-foreground mb-8 max-w-sm mx-auto text-sm leading-relaxed">
+                Join thousands of creators selling on Droply. Setup takes less than a minute.
               </p>
               <Link
                 href="/sign-up"
                 id="cta-get-started"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-linear-to-r from-accent to-purple-400 text-white font-medium hover:opacity-90 transition-all shadow-xl shadow-accent/25"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-accent text-white font-semibold text-sm hover:bg-accent-hover transition-all shadow-xl shadow-accent/20"
               >
                 Get Started — It&apos;s Free
-                <ArrowRight size={18} />
+                <ArrowRight size={16} />
               </Link>
             </div>
           </div>
