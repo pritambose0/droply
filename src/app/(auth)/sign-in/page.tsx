@@ -6,7 +6,7 @@ import { Mail, Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SigninUserDto, signinSchema } from "@/schemas/authSchema";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -57,7 +57,12 @@ function SignInContent() {
         }
         console.log(result.error);
       } else {
-        router.push("/dashboard");
+        const session = await getSession();
+        if (session?.user?.role === "creator") {
+          router.push("/seller/dashboard");
+        } else {
+          router.push("/buyer/library");
+        }
         router.refresh();
       }
     } catch (err) {
