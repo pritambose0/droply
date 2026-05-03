@@ -1,5 +1,6 @@
 import { InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from "react";
 import { twMerge } from "tailwind-merge";
+import { ShieldAlert } from "lucide-react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -48,19 +49,23 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
             inputStyles[variant],
             icon && "pl-11",
             rightIcon && "pr-11",
-            error && "border-red-500",
+            error && "border-danger/50 bg-danger/5 focus:ring-danger/30",
             className
         );
 
         return (
-            <div className={twMerge("space-y-2", containerClassName)}>
+            <div className={twMerge("space-y-2 group/input", containerClassName)}>
                 {/* Label */}
                 {label && (
                     <label
                         htmlFor={id}
-                        className={twMerge(labelStyles[variant], labelClassName)}
+                        className={twMerge(
+                            labelStyles[variant], 
+                            labelClassName,
+                            error && "text-danger"
+                        )}
                     >
-                        {label} {required && <span className="text-red-500">*</span>}
+                        {label} {required && <span className="text-danger">*</span>}
                     </label>
                 )}
 
@@ -68,7 +73,10 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
                 <div className="relative">
                     {/* Left Icon */}
                     {icon && (
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        <span className={twMerge(
+                            "absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors",
+                            error && "text-danger/70"
+                        )}>
                             {icon}
                         </span>
                     )}
@@ -93,7 +101,10 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
 
                     {/* Right Icon */}
                     {rightIcon && (
-                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        <span className={twMerge(
+                            "absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors",
+                            error && "text-danger/70"
+                        )}>
                             {rightIcon}
                         </span>
                     )}
@@ -101,7 +112,10 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
 
                 {/* Error */}
                 {error && (
-                    <p className="text-red-500 text-xs mt-1">{error}</p>
+                    <p className="text-danger text-[11px] font-medium mt-1.5 flex items-center gap-1.5 animate-fade-in">
+                        <ShieldAlert size={13} className="shrink-0" />
+                        {error}
+                    </p>
                 )}
             </div>
         );
