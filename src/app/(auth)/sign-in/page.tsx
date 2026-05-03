@@ -24,12 +24,17 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const successMessage = searchParams.get("message");
 
-  const { register, handleSubmit, getValues, formState: { errors } } = useForm<SigninUserDto>({
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm<SigninUserDto>({
     resolver: zodResolver(signinSchema),
     defaultValues: {
       email: "",
       password: "",
-    }
+    },
   });
 
   const onSubmit = async (data: SigninUserDto) => {
@@ -55,7 +60,6 @@ function SignInContent() {
         } else {
           setError(result.error);
         }
-        console.log(result.error);
       } else {
         const session = await getSession();
         if (session?.user?.role === "creator") {
@@ -95,7 +99,9 @@ function SignInContent() {
   return (
     <>
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          Welcome back
+        </h1>
         <p className="text-sm text-muted-foreground">
           Sign in to your account to continue
         </p>

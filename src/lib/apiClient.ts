@@ -3,6 +3,14 @@ import { CreateProductDto, UpdateProductDto, GetAllProductsDto } from "@/schemas
 import { CreateOrderDto } from "@/schemas/orderSchema";
 import { axiosInstance, APIResponse } from "./axios";
 
+export interface SignatureResponse {
+    signature: string;
+    timestamp: number;
+    apiKey: string;
+    cloudName: string;
+    folder: string;
+}
+
 export const AuthAPI = {
     signup: (data: RegisterUserDto): Promise<APIResponse> => axiosInstance.post("/auth/signup", data),
     verify: (data: VerifyCodeDto): Promise<APIResponse> => axiosInstance.post("/auth/verify", data),
@@ -17,7 +25,7 @@ export const ProductAPI = {
     getById: (id: string): Promise<APIResponse> => axiosInstance.get(`/products/${id}`),
     update: (id: string, data: UpdateProductDto): Promise<APIResponse> => axiosInstance.patch(`/products/${id}`, data),
     delete: (id: string): Promise<APIResponse> => axiosInstance.delete(`/products/${id}`),
-    getDownloadUrl: (productId: string, orderId: string): Promise<APIResponse> => 
+    getDownloadUrl: (productId: string, orderId: string): Promise<APIResponse> =>
         axiosInstance.get(`/products/${productId}/download`, { params: { orderId } }),
 };
 
@@ -28,5 +36,5 @@ export const OrderAPI = {
 };
 
 export const CloudinaryAPI = {
-    getSignature: (): Promise<APIResponse> => axiosInstance.post("/cloudinary-signature"),
+    getSignature: (): Promise<APIResponse<SignatureResponse>> => axiosInstance.post("/cloudinary-signature"),
 };
