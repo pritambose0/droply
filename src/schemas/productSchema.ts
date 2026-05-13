@@ -61,7 +61,13 @@ export const getAllProductsSchema = z.object({
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
 });
 
+export const productFormSchema = createProductSchema.omit({
+  fileUrl: true,
+  thumbnailUrl: true,
+});
+
 export type CreateProductDto = z.infer<typeof createProductSchema>;
 export type CreateProductInput = z.input<typeof createProductSchema>;
 export type UpdateProductDto = z.infer<typeof updateProductSchema>;
 export type GetAllProductsDto = z.infer<typeof getAllProductsSchema>;
+export type ProductFormSchema = z.input<typeof productFormSchema>;

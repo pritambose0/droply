@@ -25,11 +25,12 @@ import { X } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CreateProductDto,
-  CreateProductInput,
-  createProductSchema,
+  productFormSchema,
+  ProductFormSchema,
 } from "@/schemas/productSchema";
 import { useForm } from "react-hook-form";
 import PreviewModal from "@/components/PreviewModal";
+import router from "next/router";
 
 export default function NewProductPage() {
   const {
@@ -96,8 +97,8 @@ export default function NewProductPage() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<CreateProductInput>({
-    resolver: zodResolver(createProductSchema),
+  } = useForm<ProductFormSchema>({
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -105,12 +106,12 @@ export default function NewProductPage() {
       currency: "USD",
       status: "draft",
       tags: "",
-      fileUrl: "",
-      thumbnailUrl: "",
     },
   });
 
-  const onSubmit = async (data: CreateProductInput) => {
+  const onSubmit = async (data: ProductFormSchema) => {
+    console.log("COMMING HERE...");
+
     setSubmitError(null);
     setSubmitSuccess(false);
 
@@ -152,6 +153,7 @@ export default function NewProductPage() {
       if (!res.success)
         throw new Error(res.message || "Failed to create product.");
       setSubmitSuccess(true);
+      router.push("/seller/products");
     } catch (err: any) {
       await Promise.all([
         deleteFile(thumbResult.publicId, thumbResult.resourceType),
@@ -169,7 +171,9 @@ export default function NewProductPage() {
     <>
       <form
         className="max-w-4xl mx-auto space-y-6 pb-24 animate-fade-in-up"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, (error) => {
+          console.log("FORM ERROR:", error);
+        })}
       >
         {/* ── Header / Sticky Action Bar ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between sticky top-0 z-20 glass p-4 rounded-2xl border-card-border/60 shadow-sm mt-2 gap-4">
