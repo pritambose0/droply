@@ -19,7 +19,7 @@ export const createProductSchema = z.object({
   currency: z.enum(SUPPORTED_CURRENCIES),
   fileUrl: z.url("Invalid file URL").trim(),
   thumbnailUrl: z.url("Invalid thumbnail URL").trim(),
-  status: z.enum(["draft", "published"]),
+  status: z.enum(["draft", "published"]).default("published"),
   tags: z
     .union([z.string(), z.array(z.string())])
     .transform((val) => {
@@ -66,8 +66,21 @@ export const productFormSchema = createProductSchema.omit({
   thumbnailUrl: true,
 });
 
+export const productResponseSchema = createProductSchema.extend({
+  id: z.string().min(1, "Product ID is required").trim(),
+  createdAt: z.string().transform((val) => new Date(val)),
+  updatedAt: z.string().transform((val) => new Date(val)),
+  deletedAt: z
+    .string()
+    .transform((val) => new Date(val))
+    .optional(),
+  userId: z.string().min(1, "User ID is required").trim(),
+  salesCount: z.number().min(0, "Sales count must be at least 0"),
+});
+
 export type CreateProductDto = z.infer<typeof createProductSchema>;
 export type CreateProductInput = z.input<typeof createProductSchema>;
 export type UpdateProductDto = z.infer<typeof updateProductSchema>;
 export type GetAllProductsDto = z.infer<typeof getAllProductsSchema>;
 export type ProductFormSchema = z.input<typeof productFormSchema>;
+export type ProductResponseDto = z.infer<typeof productResponseSchema>;

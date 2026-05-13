@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -14,8 +14,8 @@ import {
   Box,
 } from "lucide-react";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
-
-/* ──────────── Product Card (Grid View) ──────────── */
+import { ProductAPI } from "@/lib/apiClient";
+import { ProductResponseDto } from "@/schemas/productSchema";
 
 /* ──────────── Mock Data ──────────── */
 const currencySymbols: Record<string, string> = {
@@ -25,14 +25,7 @@ const currencySymbols: Record<string, string> = {
   INR: "₹",
 };
 
-const products: any[] = []; // Real wiring would go here
-
-/* ──────────── Product Card (Grid View) ──────────── */
-function ProductCard({
-  product,
-}: {
-  product: any;
-}) {
+function ProductCard({ product }: { product: ProductResponseDto }) {
   const gradients = [
     "from-violet-600/20 to-indigo-600/20",
     "from-rose-600/20 to-pink-600/20",
@@ -44,27 +37,57 @@ function ProductCard({
   const gradient = gradients[parseInt(product.id) % gradients.length];
 
   return (
-    <div className="glass rounded-2xl overflow-hidden group hover:border-accent/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5">
+    <div className="glass rounded-2xl overflow-hidden group hover:border-accent/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 cursor-pointer">
       {/* Thumbnail Placeholder */}
-      <div className={`relative h-40 bg-linear-to-br ${gradient} flex items-center justify-center`}>
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-white/30">
-          <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-          <line x1="12" y1="22.08" x2="12" y2="12" />
-        </svg>
+      <div
+        className={`relative h-40 bg-linear-to-br ${gradient} flex items-center justify-center`}
+      >
+        {product.thumbnailUrl ? (
+          <img
+            src={product.thumbnailUrl}
+            alt={product.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-white/30"
+          >
+            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+          </svg>
+        )}
         {/* Status badge */}
         <div className="absolute top-3 right-3">
           <StatusBadge status={product.status} />
         </div>
         {/* Hover actions */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
-          <button className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg" title="Preview">
+          <button
+            className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+            title="Preview"
+          >
             <Eye size={18} />
           </button>
-          <Link href={`/seller/products/${product.id}/edit`} className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg" title="Edit">
+          <Link
+            href={`/seller/products/${product.id}/edit`}
+            className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+            title="Edit"
+          >
             <Pencil size={18} />
           </Link>
-          <button className="w-9 h-9 rounded-xl bg-danger text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg" title="Delete">
+          <button
+            className="w-9 h-9 rounded-xl bg-danger text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+            title="Delete"
+          >
             <Trash2 size={18} />
           </button>
         </div>
@@ -81,7 +104,7 @@ function ProductCard({
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {product.tags.slice(0, 3).map((tag: any) => (
+          {product.tags?.slice(0, 3).map((tag: any) => (
             <span
               key={tag}
               className="px-2 py-0.5 rounded-md bg-surface text-xs text-muted-foreground"
@@ -89,7 +112,7 @@ function ProductCard({
               {tag}
             </span>
           ))}
-          {product.tags.length > 3 && (
+          {product.tags?.length > 3 && (
             <span className="px-2 py-0.5 rounded-md bg-surface text-xs text-muted">
               +{product.tags.length - 3}
             </span>
@@ -99,10 +122,13 @@ function ProductCard({
         {/* Price & Sales */}
         <div className="flex items-center justify-between">
           <span className="text-lg font-bold gradient-text">
-            {currencySymbols[product.currency]}{product.price.toLocaleString()}
+            {currencySymbols[product.currency]}
+            {product.price?.toLocaleString()}
           </span>
           <span className="text-xs text-muted-foreground">
-            {product.salesCount > 0 ? `${product.salesCount} sales` : "No sales yet"}
+            {product.salesCount > 0
+              ? `${product.salesCount} sales`
+              : "No sales yet"}
           </span>
         </div>
       </div>
@@ -111,16 +137,20 @@ function ProductCard({
 }
 
 /* ──────────── Product Row (List View) ──────────── */
-function ProductRow({
-  product,
-}: {
-  product: any;
-}) {
+function ProductRow({ product }: { product: ProductResponseDto }) {
   return (
-    <div className="glass rounded-xl p-4 flex items-center gap-4 hover:border-accent/20 transition-all group">
+    <div className="glass rounded-xl p-4 flex items-center gap-4 hover:border-accent/20 transition-all group cursor-pointer">
       {/* Mini thumbnail */}
       <div className="w-16 h-16 rounded-xl bg-linear-to-br from-accent/20 to-purple-500/20 flex items-center justify-center shrink-0">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-accent/50">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          className="text-accent/50"
+        >
           <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
           <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
           <line x1="12" y1="22.08" x2="12" y2="12" />
@@ -130,13 +160,20 @@ function ProductRow({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-foreground truncate">{product.title}</h3>
+          <h3 className="font-semibold text-foreground truncate">
+            {product.title}
+          </h3>
           <StatusBadge status={product.status} />
         </div>
-        <p className="text-xs text-muted-foreground truncate mt-0.5">{product.description}</p>
+        <p className="text-xs text-muted-foreground truncate mt-0.5">
+          {product.description}
+        </p>
         <div className="flex gap-1.5 mt-1.5">
           {product.tags.slice(0, 4).map((tag: any) => (
-            <span key={tag} className="px-1.5 py-0.5 rounded bg-surface text-[10px] text-muted-foreground">
+            <span
+              key={tag}
+              className="px-1.5 py-0.5 rounded bg-surface text-[10px] text-muted-foreground"
+            >
               {tag}
             </span>
           ))}
@@ -146,20 +183,33 @@ function ProductRow({
       {/* Price */}
       <div className="text-right shrink-0">
         <div className="font-bold text-foreground">
-          {currencySymbols[product.currency]}{product.price.toLocaleString()}
+          {currencySymbols[product.currency]}
+          {product.price?.toLocaleString()}
         </div>
-        <div className="text-xs text-muted-foreground">{product.salesCount} sales</div>
+        <div className="text-xs text-muted-foreground">
+          {product.salesCount} sales
+        </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button className="w-8 h-8 rounded-lg hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors" title="Preview">
+        <button
+          className="w-8 h-8 rounded-lg hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          title="Preview"
+        >
           <Eye size={16} />
         </button>
-        <Link href={`/seller/products/${product.id}/edit`} className="w-8 h-8 rounded-lg hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors" title="Edit">
+        <Link
+          href={`/seller/products/${product.id}/edit`}
+          className="w-8 h-8 rounded-lg hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          title="Edit"
+        >
           <Pencil size={16} />
         </Link>
-        <button className="w-8 h-8 rounded-lg hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors" title="Delete">
+        <button
+          className="w-8 h-8 rounded-lg hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors"
+          title="Delete"
+        >
           <Trash2 size={16} />
         </button>
       </div>
@@ -174,11 +224,17 @@ function EmptyState() {
       <div className="w-20 h-20 rounded-3xl bg-accent/5 flex items-center justify-center mx-auto mb-6 animate-float">
         <Box size={40} className="text-accent/30" />
       </div>
-      <h3 className="text-xl font-bold text-foreground mb-2">No products yet</h3>
+      <h3 className="text-xl font-bold text-foreground mb-2">
+        No products yet
+      </h3>
       <p className="text-sm text-muted-foreground mb-8 max-w-sm mx-auto leading-relaxed">
-        Start your creator journey by uploading your first digital masterpiece. It only takes a minute!
+        Start your creator journey by uploading your first digital masterpiece.
+        It only takes a minute!
       </p>
-      <Link href="/seller/products/new" className="inline-flex items-center gap-2.5 px-8 py-3 rounded-xl bg-accent text-white font-bold text-sm hover:bg-accent/90 transition-all shadow-xl shadow-accent/20">
+      <Link
+        href="/seller/products/new"
+        className="inline-flex items-center gap-2.5 px-8 py-3 rounded-xl bg-accent text-white font-bold text-sm hover:bg-accent/90 transition-all shadow-xl shadow-accent/20"
+      >
         <Plus size={20} />
         Create First Product
       </Link>
@@ -190,13 +246,36 @@ function EmptyState() {
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "published" | "draft"
+  >("all");
   const [sortBy, setSortBy] = useState("createdAt");
+  const [products, setProducts] = useState<ProductResponseDto[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await ProductAPI.getAll();
+        console.log(response);
+        if (response.success && response.data) {
+          setProducts(response.data.products);
+        } else {
+          setProducts([]);
+          console.error("Error fetching products", response);
+        }
+      } catch (error) {
+        setProducts([]);
+        console.error("Error fetching products", error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filtered = products
-    .filter((p) => {
+    ?.filter((p) => {
       if (statusFilter !== "all" && p.status !== statusFilter) return false;
-      if (search && !p.title.toLowerCase().includes(search.toLowerCase())) return false;
+      if (search && !p.title?.toLowerCase().includes(search?.toLowerCase()))
+        return false;
       return true;
     })
     .sort((a, b) => {
@@ -204,13 +283,16 @@ export default function ProductsPage() {
       if (sortBy === "sales") return b.salesCount - a.salesCount;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+  console.log("PRODUCTS: ", products);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Products</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            Products
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage your digital products ({products.length} total)
           </p>
@@ -249,10 +331,11 @@ export default function ProductsPage() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-4 py-2 text-xs font-medium capitalize transition-colors ${statusFilter === s
-                  ? "bg-accent text-white"
-                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
-                  }`}
+                className={`px-4 py-2 text-xs font-medium capitalize transition-colors ${
+                  statusFilter === s
+                    ? "bg-accent text-white"
+                    : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
+                }`}
               >
                 {s}
               </button>
@@ -280,20 +363,22 @@ export default function ProductsPage() {
           <div className="flex rounded-xl overflow-hidden border border-card-border">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-2.5 transition-all ${viewMode === "grid"
-                ? "bg-accent text-white shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
-                }`}
+              className={`p-2.5 transition-all ${
+                viewMode === "grid"
+                  ? "bg-accent text-white shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
+              }`}
               title="Grid View"
             >
               <Grid size={18} />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-2.5 transition-all ${viewMode === "list"
-                ? "bg-accent text-white shadow-lg"
-                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
-                }`}
+              className={`p-2.5 transition-all ${
+                viewMode === "list"
+                  ? "bg-accent text-white shadow-lg"
+                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover"
+              }`}
               title="List View"
             >
               <List size={18} />
@@ -306,9 +391,14 @@ export default function ProductsPage() {
       {filtered.length === 0 ? (
         search || statusFilter !== "all" ? (
           <div className="glass rounded-2xl p-12 text-center">
-            <p className="text-muted-foreground">No products match your filters.</p>
+            <p className="text-muted-foreground">
+              No products match your filters.
+            </p>
             <button
-              onClick={() => { setSearch(""); setStatusFilter("all"); }}
+              onClick={() => {
+                setSearch("");
+                setStatusFilter("all");
+              }}
               className="mt-3 text-sm text-accent hover:text-accent-hover transition-colors"
             >
               Clear filters

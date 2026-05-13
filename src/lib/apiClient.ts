@@ -8,6 +8,7 @@ import {
   CreateProductDto,
   UpdateProductDto,
   GetAllProductsDto,
+  ProductResponseDto,
 } from "@/schemas/productSchema";
 import { CreateOrderDto } from "@/schemas/orderSchema";
 import { axiosInstance, APIResponse } from "./axios";
@@ -36,8 +37,17 @@ export const AuthAPI = {
 export const ProductAPI = {
   create: (data: CreateProductDto): Promise<APIResponse> =>
     axiosInstance.post("/products", data),
-  getAll: (params?: GetAllProductsDto): Promise<APIResponse> =>
-    axiosInstance.get("/products", { params }),
+  getAll: (
+    params?: GetAllProductsDto,
+  ): Promise<
+    APIResponse<{
+      products: ProductResponseDto[];
+      page: number;
+      limit: number;
+      totalPages: number;
+      totalProducts: number;
+    }>
+  > => axiosInstance.get("/products", { params }),
   getById: (id: string): Promise<APIResponse> =>
     axiosInstance.get(`/products/${id}`),
   update: (id: string, data: UpdateProductDto): Promise<APIResponse> =>

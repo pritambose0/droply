@@ -16,12 +16,13 @@ export function StatusBadge({ status }: StatusBadgeProps) {
     draft: "bg-warning/10 text-warning border-warning/20",
   };
 
-  const statusType = status.toLowerCase();
+  const statusType = status?.toLowerCase();
 
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border capitalize backdrop-blur-sm transition-all hover:scale-105 ${
-        colors[statusType] || "bg-surface text-muted-foreground border-card-border"
+        colors[statusType] ||
+        "bg-surface text-muted-foreground border-card-border"
       }`}
     >
       <span
@@ -29,10 +30,10 @@ export function StatusBadge({ status }: StatusBadgeProps) {
           ["paid", "completed", "published"].includes(statusType)
             ? "bg-success animate-pulse"
             : ["pending", "processing"].includes(statusType)
-            ? statusType === "pending"
-              ? "bg-warning"
-              : "bg-accent"
-            : "bg-danger"
+              ? statusType === "pending"
+                ? "bg-warning"
+                : "bg-accent"
+              : "bg-danger"
         }`}
       />
       {status}

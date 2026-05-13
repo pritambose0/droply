@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 import {
@@ -13,6 +13,8 @@ import {
   ShieldAlert,
   Download,
   Plus,
+  AlertCircle,
+  CheckCircle2,
 } from "lucide-react";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
@@ -30,7 +32,7 @@ import {
 } from "@/schemas/productSchema";
 import { useForm } from "react-hook-form";
 import PreviewModal from "@/components/PreviewModal";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function NewProductPage() {
   const {
@@ -62,6 +64,8 @@ export default function NewProductPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const router = useRouter();
+
   const {
     uploadFile,
     deleteFile,
@@ -70,32 +74,23 @@ export default function NewProductPage() {
     error: uploadError,
   } = useCloudinaryUpload();
 
-  const actions = [
-    {
-      label: "Preview",
-      variant: "ghost" as const,
-      onClick: () => setShowPreview(true),
-      disabled: isUploading,
-    },
-    {
-      label: "Save Draft",
-      variant: "secondary" as const,
-      onClick: () => {},
-      disabled: isUploading,
-    },
-    {
-      label: isUploading ? `Uploading… ${progress}%` : "Publish",
-      variant: "primary" as const,
-      icon: isUploading ? null : <Save size={16} />,
-      onClick: () => {},
-      disabled: isUploading,
-    },
-  ];
+  // Auto-dismiss success message after 5s
+  useEffect(() => {
+    if (submitSuccess) {
+      const timer = setTimeout(() => setSubmitSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitSuccess]);
+
+  // Combine all error sources into one
+  const activeError = submitError || uploadError || null;
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
+    setValue,
     formState: { errors },
   } = useForm<ProductFormSchema>({
     resolver: zodResolver(productFormSchema),
@@ -104,16 +99,15 @@ export default function NewProductPage() {
       description: "",
       price: 0,
       currency: "USD",
-      status: "draft",
       tags: "",
+      status: "published",
     },
   });
 
   const onSubmit = async (data: ProductFormSchema) => {
-    console.log("COMMING HERE...");
-
     setSubmitError(null);
     setSubmitSuccess(false);
+    console.log("DATA", data);
 
     // Upload thumbnail
     if (!thumbFile) {
@@ -139,6 +133,7 @@ export default function NewProductPage() {
       ...data,
       thumbnailUrl: thumbResult.secureUrl,
       fileUrl: fileResult.secureUrl,
+      status: data.status as "draft" | "published",
       tags:
         typeof data.tags === "string"
           ? data.tags
@@ -153,7 +148,8 @@ export default function NewProductPage() {
       if (!res.success)
         throw new Error(res.message || "Failed to create product.");
       setSubmitSuccess(true);
-      router.push("/seller/products");
+      reset();
+      router.replace("/seller/products");
     } catch (err: any) {
       await Promise.all([
         deleteFile(thumbResult.publicId, thumbResult.resourceType),
@@ -176,42 +172,91 @@ export default function NewProductPage() {
         })}
       >
         {/* ── Header / Sticky Action Bar ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between sticky top-0 z-20 glass p-4 rounded-2xl border-card-border/60 shadow-sm mt-2 gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/seller/products"
-              className="p-2 rounded-xl hover:bg-surface text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft size={20} />
-            </Link>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">
-                Create New Product
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                Draft mode automatically saved.
-              </p>
+        <div className="sticky top-0 z-20 mt-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between glass p-4 rounded-2xl border-card-border/60 shadow-sm gap-4">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/seller/products"
+                className="p-2 rounded-xl hover:bg-surface text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft size={20} />
+              </Link>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">
+                  Create New Product
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  Draft mode automatically saved.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 self-end sm:self-auto">
+              <Button
+                variant="ghost"
+                onClick={() => setShowPreview(true)}
+                className="px-4 py-2"
+                type="button"
+                disabled={isUploading}
+              >
+                Preview
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setValue("status", "draft");
+                  handleSubmit(onSubmit)();
+                }}
+                className="px-4 py-2"
+                type="button"
+                disabled={isUploading}
+              >
+                Save Draft
+              </Button>
+              <Button
+                variant="primary"
+                className="px-4 py-2"
+                type="submit"
+                isLoading={isUploading}
+                loadingText={`Uploading… ${progress}%`}
+              >
+                <Save size={16} />
+                Publish
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-3 self-end sm:self-auto">
-            {actions.map((action) => (
-              <Button
-                key={action.label}
-                variant={action.variant}
-                onClick={action.onClick}
-                className="px-4 py-2"
-                type={
-                  action.label === "Publish" ||
-                  action.label.startsWith("Uploading")
-                    ? "submit"
-                    : "button"
-                }
+
+          {/* ── Upload Progress Bar ── */}
+          {isUploading && (
+            <div className="mt-2 rounded-xl overflow-hidden bg-surface/50 backdrop-blur-sm border border-card-border/40 h-1.5">
+              <div
+                className="h-full bg-linear-to-r from-accent to-purple-400 transition-all duration-300 ease-out rounded-full"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
+
+          {/* ── Error Toast (always visible in sticky header) ── */}
+          {activeError && (
+            <div className="mt-2 p-3 rounded-xl border border-danger/30 bg-danger/10 backdrop-blur-sm text-danger text-sm flex items-center gap-2.5 animate-fade-in">
+              <AlertCircle size={16} className="shrink-0" />
+              <span className="flex-1">{activeError}</span>
+              <button
+                type="button"
+                onClick={() => setSubmitError(null)}
+                className="p-1 rounded-lg hover:bg-danger/20 transition-colors"
               >
-                {action.icon}
-                {action.label}
-              </Button>
-            ))}
-          </div>
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          {/* ── Success Toast ── */}
+          {submitSuccess && (
+            <div className="mt-2 p-3 rounded-xl border border-success/30 bg-success/10 backdrop-blur-sm text-success text-sm flex items-center gap-2.5 animate-fade-in">
+              <CheckCircle2 size={16} className="shrink-0" />
+              Product published successfully!
+            </div>
+          )}
         </div>
 
         <div className="space-y-8 mt-8">
@@ -496,20 +541,6 @@ export default function NewProductPage() {
             />
           </section>
         </div>
-
-        {/* ── Global feedback ── */}
-        {(submitError || uploadError) && (
-          <div className="mt-4 p-4 rounded-xl border border-danger/30 bg-danger/5 text-danger text-sm flex items-center gap-2">
-            <ShieldAlert size={16} className="shrink-0" />
-            {submitError || uploadError}
-          </div>
-        )}
-
-        {submitSuccess && (
-          <div className="mt-4 p-4 rounded-xl border border-success/30 bg-success/5 text-success text-sm">
-            ✓ Product published successfully!
-          </div>
-        )}
       </form>
       <PreviewModal
         isOpen={showPreview}
