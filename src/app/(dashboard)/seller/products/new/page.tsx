@@ -17,6 +17,8 @@ import {
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { useFileUpload } from "@/hooks/useFileUpload";
+import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
+import { ProductAPI } from "@/lib/apiClient";
 import Image from "next/image";
 import { UPLOAD_CONFIG } from "@/constants/fileUpload";
 import { X } from "lucide-react";
@@ -33,6 +35,7 @@ export default function NewProductPage() {
   const {
     inputRef: thumbInputRef,
     preview: thumbPreview,
+    file: thumbFile,
     handleFile: handleThumbFile,
     removeFile: removeThumb,
     error: thumbError,
@@ -44,6 +47,7 @@ export default function NewProductPage() {
   const {
     inputRef: fileInputRef,
     fileName: productFileName,
+    file: productFile,
     handleFile: handleProductFile,
     removeFile: removeProductFile,
     error: fileError,
@@ -54,23 +58,36 @@ export default function NewProductPage() {
   });
 
   const [showPreview, setShowPreview] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const {
+    uploadFile,
+    deleteFile,
+    isLoading: isUploading,
+    progress,
+    error: uploadError,
+  } = useCloudinaryUpload();
 
   const actions = [
     {
       label: "Preview",
       variant: "ghost" as const,
       onClick: () => setShowPreview(true),
+      disabled: isUploading,
     },
     {
       label: "Save Draft",
       variant: "secondary" as const,
       onClick: () => {},
+      disabled: isUploading,
     },
     {
-      label: "Publish",
+      label: isUploading ? `Uploading… ${progress}%` : "Publish",
       variant: "primary" as const,
-      icon: <Save size={16} />,
+      icon: isUploading ? null : <Save size={16} />,
       onClick: () => {},
+      disabled: isUploading,
     },
   ];
 
@@ -94,8 +111,56 @@ export default function NewProductPage() {
   });
 
   const onSubmit = async (data: CreateProductInput) => {
-    console.log("COMMING HERE...");
-    console.log("PRODUCT DATA:", data);
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    // Upload thumbnail
+    if (!thumbFile) {
+      setSubmitError("Please select a product thumbnail.");
+      return;
+    }
+    if (!productFile) {
+      setSubmitError("Please select a product file.");
+      return;
+    }
+
+    const thumbResult = await uploadFile(thumbFile);
+    if (!thumbResult) return;
+
+    const fileResult = await uploadFile(productFile);
+    if (!fileResult) {
+      await deleteFile(thumbResult.publicId, thumbResult.resourceType);
+      return;
+    }
+
+    // Submit to backend
+    const payload: CreateProductDto = {
+      ...data,
+      thumbnailUrl: thumbResult.secureUrl,
+      fileUrl: fileResult.secureUrl,
+      tags:
+        typeof data.tags === "string"
+          ? data.tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : data.tags,
+    };
+
+    try {
+      const res = await ProductAPI.create(payload);
+      if (!res.success)
+        throw new Error(res.message || "Failed to create product.");
+      setSubmitSuccess(true);
+    } catch (err: any) {
+      await Promise.all([
+        deleteFile(thumbResult.publicId, thumbResult.resourceType),
+        deleteFile(fileResult.publicId, fileResult.resourceType),
+      ]);
+      setSubmitError(
+        err.response?.data?.message || err.message || "Something went wrong.",
+      );
+    }
   };
 
   const formValues = watch();
@@ -131,7 +196,12 @@ export default function NewProductPage() {
                 variant={action.variant}
                 onClick={action.onClick}
                 className="px-4 py-2"
-                type={action.label === "Publish" ? "submit" : "button"}
+                type={
+                  action.label === "Publish" ||
+                  action.label.startsWith("Uploading")
+                    ? "submit"
+                    : "button"
+                }
               >
                 {action.icon}
                 {action.label}
@@ -422,6 +492,20 @@ export default function NewProductPage() {
             />
           </section>
         </div>
+
+        {/* ── Global feedback ── */}
+        {(submitError || uploadError) && (
+          <div className="mt-4 p-4 rounded-xl border border-danger/30 bg-danger/5 text-danger text-sm flex items-center gap-2">
+            <ShieldAlert size={16} className="shrink-0" />
+            {submitError || uploadError}
+          </div>
+        )}
+
+        {submitSuccess && (
+          <div className="mt-4 p-4 rounded-xl border border-success/30 bg-success/5 text-success text-sm">
+            ✓ Product published successfully!
+          </div>
+        )}
       </form>
       <PreviewModal
         isOpen={showPreview}
