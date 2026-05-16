@@ -49,7 +49,7 @@ export class ProductService {
 
     const filter: Record<string, unknown> = {};
 
-    if (status) {
+    if (status && status !== "all") {
       filter.status = status;
     }
 
@@ -75,7 +75,6 @@ export class ProductService {
     });
 
     const totalProducts = await ProductModel.countDocuments(filter);
-    console.log("FILTER: ", filter);
 
     return {
       products,

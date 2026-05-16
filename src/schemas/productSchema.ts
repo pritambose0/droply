@@ -59,7 +59,7 @@ export const getAllProductsSchema = z.object({
   query: z.string().optional().default(""),
   sortBy: z.string().optional().default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
-  status: z.enum(["draft", "published"]).optional(),
+  status: z.enum(["all", "draft", "published"]).optional(),
 });
 
 export const productFormSchema = createProductSchema.omit({

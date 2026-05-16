@@ -45,8 +45,8 @@ export async function GET(request: Request) {
       limit: Number(searchParams.get("limit") || 10),
       query: searchParams.get("query") || "",
       sortBy: searchParams.get("sortBy") || "createdAt",
-      sortOrder: (searchParams.get("sortOrder") || "desc") as "asc" | "desc",
-      status: searchParams.get("status") as "draft" | "published" | undefined,
+      sortOrder: searchParams.get("sortOrder") || "desc",
+      status: searchParams.get("status"),
     };
 
     const validatedBody = validate(getAllProductsSchema, body);

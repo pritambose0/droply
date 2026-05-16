@@ -7,8 +7,8 @@ import {
 import {
   CreateProductDto,
   UpdateProductDto,
-  GetAllProductsDto,
   ProductResponseDto,
+  GetAllProductsInput,
 } from "@/schemas/productSchema";
 import { CreateOrderDto } from "@/schemas/orderSchema";
 import { axiosInstance, APIResponse } from "./axios";
@@ -38,7 +38,7 @@ export const ProductAPI = {
   create: (data: CreateProductDto): Promise<APIResponse> =>
     axiosInstance.post("/products", data),
   getAll: (
-    params?: GetAllProductsDto,
+    params?: GetAllProductsInput,
   ): Promise<
     APIResponse<{
       products: ProductResponseDto[];
