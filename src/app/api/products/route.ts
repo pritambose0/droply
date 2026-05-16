@@ -5,36 +5,57 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../auth/[...nextauth]/options";
 import { ApiError } from "@/helpers/ApiError";
+import { validate } from "@/helpers/validate";
+import {
+  createProductSchema,
+  getAllProductsSchema,
+} from "@/schemas/productSchema";
 
 export async function POST(request: Request) {
-    return handleRequest(async () => {
-        const session = await getServerSession(authOptions);
-        if (!session) {
-            throw new ApiError(401, "You are not authenticated");
-        }
+  return handleRequest(async () => {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      throw new ApiError(401, "You are not authenticated");
+    }
 
-        if (session.user.role !== "creator") {
-            throw new ApiError(403, "Only creators can create products");
-        }
-        const body = await request.json();
-        const product = await ProductService.createProduct(body, session.user.id);
+    if (session.user.role !== "creator") {
+      throw new ApiError(403, "Only creators can create products");
+    }
+    const body = await request.json();
 
-        return NextResponse.json(new ApiResponse(201, "Product created successfully", product), { status: 201 })
-    })
+    const validatedBody = validate(createProductSchema, body);
+
+    const product = await ProductService.createProduct(
+      validatedBody,
+      session.user.id,
+    );
+
+    return NextResponse.json(
+      new ApiResponse(201, "Product created successfully", product),
+      { status: 201 },
+    );
+  });
 }
 
 export async function GET(request: Request) {
-    return handleRequest(async () => {
-        const { searchParams } = new URL(request.url);
-        const body = {
-            page: Number(searchParams.get("page") || 1),
-            limit: Number(searchParams.get("limit") || 10),
-            query: searchParams.get("query") || "",
-            sortBy: searchParams.get("sortBy") || "createdAt",
-            sortOrder: (searchParams.get("sortOrder") || "desc") as "asc" | "desc"
-        };
-        const products = await ProductService.getAllProducts(body);
+  return handleRequest(async () => {
+    const { searchParams } = new URL(request.url);
+    const body = {
+      page: Number(searchParams.get("page") || 1),
+      limit: Number(searchParams.get("limit") || 10),
+      query: searchParams.get("query") || "",
+      sortBy: searchParams.get("sortBy") || "createdAt",
+      sortOrder: (searchParams.get("sortOrder") || "desc") as "asc" | "desc",
+      status: searchParams.get("status") as "draft" | "published" | undefined,
+    };
 
-        return NextResponse.json(new ApiResponse(200, "Products fetched successfully", products), { status: 200 })
-    })
+    const validatedBody = validate(getAllProductsSchema, body);
+
+    const products = await ProductService.getAllProducts(validatedBody);
+
+    return NextResponse.json(
+      new ApiResponse(200, "Products fetched successfully", products),
+      { status: 200 },
+    );
+  });
 }

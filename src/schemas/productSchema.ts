@@ -59,6 +59,7 @@ export const getAllProductsSchema = z.object({
   query: z.string().optional().default(""),
   sortBy: z.string().optional().default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+  status: z.enum(["draft", "published"]).optional(),
 });
 
 export const productFormSchema = createProductSchema.omit({
@@ -82,5 +83,6 @@ export type CreateProductDto = z.infer<typeof createProductSchema>;
 export type CreateProductInput = z.input<typeof createProductSchema>;
 export type UpdateProductDto = z.infer<typeof updateProductSchema>;
 export type GetAllProductsDto = z.infer<typeof getAllProductsSchema>;
+export type GetAllProductsInput = z.input<typeof getAllProductsSchema>;
 export type ProductFormSchema = z.input<typeof productFormSchema>;
 export type ProductResponseDto = z.infer<typeof productResponseSchema>;

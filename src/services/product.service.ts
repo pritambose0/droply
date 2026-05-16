@@ -1,15 +1,12 @@
 import { ApiError } from "@/helpers/ApiError";
-import { validate } from "@/helpers/validate";
 import OrderModel from "@/models/Order";
 import ProductModel from "@/models/Product";
 import {
   CreateProductDto,
-  createProductSchema,
   GetAllProductsDto,
-  getAllProductsSchema,
   UpdateProductDto,
-  updateProductSchema,
 } from "@/schemas/productSchema";
+import { isValidObjectId } from "mongoose";
 
 export class ProductService {
   static async createProduct(product: CreateProductDto, creatorId: string) {
@@ -22,7 +19,7 @@ export class ProductService {
       thumbnailUrl,
       status,
       tags,
-    } = validate(createProductSchema, product);
+    } = product;
 
     const existingProduct = await ProductModel.findOne({
       $and: [{ title }, { creatorId }],
@@ -48,12 +45,13 @@ export class ProductService {
   }
 
   static async getAllProducts(product: GetAllProductsDto) {
-    const { page, limit, query, sortBy, sortOrder } = validate(
-      getAllProductsSchema,
-      product,
-    );
+    const { page, limit, query, sortBy, sortOrder, status } = product;
 
-    const filter: Record<string, unknown> = { status: "published" };
+    const filter: Record<string, unknown> = {};
+
+    if (status) {
+      filter.status = status;
+    }
 
     if (query) {
       filter.$or = [
@@ -77,6 +75,7 @@ export class ProductService {
     });
 
     const totalProducts = await ProductModel.countDocuments(filter);
+    console.log("FILTER: ", filter);
 
     return {
       products,
@@ -87,6 +86,13 @@ export class ProductService {
   }
 
   static async getProductById(id: string) {
+    if (!id || !isValidObjectId(id)) {
+      throw new ApiError(
+        400,
+        "Product ID is required and must be a valid ObjectId",
+      );
+    }
+
     const product = await ProductModel.findById(id);
 
     if (!product) {
@@ -110,7 +116,11 @@ export class ProductService {
       thumbnailUrl,
       status,
       tags,
-    } = validate(updateProductSchema, product);
+    } = product;
+
+    if (!isValidObjectId(productId) || !isValidObjectId(creatorId)) {
+      throw new ApiError(400, "Invalid product ID or creator ID");
+    }
 
     const existingProduct = await ProductModel.findById(productId);
 
@@ -145,6 +155,10 @@ export class ProductService {
   }
 
   static async deleteProduct(creatorId: string, productId: string) {
+    if (!isValidObjectId(productId) || !isValidObjectId(creatorId)) {
+      throw new ApiError(400, "Invalid product ID or creator ID");
+    }
+
     const existingProduct = await ProductModel.findById(productId);
 
     if (!existingProduct) {
@@ -165,6 +179,14 @@ export class ProductService {
     orderId: string,
     userId: string,
   ) {
+    if (
+      !isValidObjectId(productId) ||
+      !isValidObjectId(orderId) ||
+      !isValidObjectId(userId)
+    ) {
+      throw new ApiError(400, "Invalid product ID or order ID or user ID");
+    }
+
     const product = await ProductModel.findById(productId).select("+fileUrl");
 
     if (!product) {
