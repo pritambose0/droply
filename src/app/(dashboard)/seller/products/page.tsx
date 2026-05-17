@@ -13,6 +13,7 @@ import { ProductRow } from "@/components/products/ProductRow";
 import { ProductSkeleton } from "@/components/products/ProductSkeleton";
 import { EmptyState } from "@/components/products/EmptyState";
 import { NoResults } from "@/components/products/NoResults";
+import { ProductPagination } from "@/components/products/ProductPagination";
 
 export default function ProductsPage() {
   const { getParam, setParams, clearParams } = useQueryParams();
@@ -29,12 +30,16 @@ export default function ProductsPage() {
   // Debounced search for API performance
   const debouncedSearch = useDebounce(search, 500);
 
+  // Get Pagination Params
+  const page = getParam("page", "1");
+
   // Setters that update the URL
-  const setSearch = (val: string) => setParams({ q: val });
+  const setSearch = (val: string) => setParams({ q: val, page: "1" });
   const setStatusFilter = (val: "all" | "published" | "draft") =>
-    setParams({ status: val });
-  const setSortBy = (val: string) => setParams({ sortBy: val });
+    setParams({ status: val, page: "1" });
+  const setSortBy = (val: string) => setParams({ sortBy: val, page: "1" });
   const setViewMode = (val: "grid" | "list") => setParams({ view: val });
+  const setPage = (page: number) => setParams({ page: page.toString() });
 
   // Data State
   const [productResponse, setProductResponse] = useState<{
@@ -54,6 +59,8 @@ export default function ProductsPage() {
           query: debouncedSearch,
           sortBy: sortBy,
           sortOrder: "desc",
+          page: Number(page),
+          limit: 9,
         });
         if (response.success && response.data) {
           setProductResponse(response.data);
@@ -69,7 +76,7 @@ export default function ProductsPage() {
       }
     };
     fetchProducts();
-  }, [statusFilter, debouncedSearch, sortBy]);
+  }, [statusFilter, debouncedSearch, sortBy, page]);
 
   const displayProducts = productResponse?.products || [];
   const totalCount = productResponse?.totalProducts || 0;
@@ -112,13 +119,13 @@ export default function ProductsPage() {
         {isLoading ? (
           viewMode === "grid" ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {[...Array(6)].map((_, i) => (
+              {[...Array(9)].map((_, i) => (
                 <ProductSkeleton key={i} viewMode="grid" />
               ))}
             </div>
           ) : (
             <div className="space-y-3">
-              {[...Array(6)].map((_, i) => (
+              {[...Array(9)].map((_, i) => (
                 <ProductSkeleton key={i} viewMode="list" />
               ))}
             </div>
@@ -143,6 +150,15 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!isLoading && displayProducts.length > 0 && (
+        <ProductPagination
+          currentPage={productResponse?.page || 1}
+          totalPages={productResponse?.totalPages || 1}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }
