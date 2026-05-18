@@ -1,3 +1,4 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { ApiError } from "@/helpers/ApiError";
 import OrderModel from "@/models/Order";
 import ProductModel from "@/models/Product";
@@ -7,6 +8,7 @@ import {
   UpdateProductDto,
 } from "@/schemas/productSchema";
 import { isValidObjectId } from "mongoose";
+import { getServerSession } from "next-auth";
 
 export class ProductService {
   static async createProduct(product: CreateProductDto, creatorId: string) {
@@ -92,13 +94,23 @@ export class ProductService {
       );
     }
 
-    const product = await ProductModel.findById(id);
+    const product = await ProductModel.findById(id).select("+fileUrl");
 
     if (!product) {
       throw new ApiError(404, "Product not found");
     }
 
-    return product;
+    const session = await getServerSession(authOptions);
+
+    // Mongoose's toJSON automatically deletes fileUrl (as defined in the model).
+    const productData = product.toJSON();
+
+    // If the requester is the owner, we manually attach the fileUrl back!
+    if (session && session.user.id === product.creatorId.toString()) {
+      productData.fileUrl = product.fileUrl;
+    }
+
+    return productData;
   }
 
   static async updateProduct(

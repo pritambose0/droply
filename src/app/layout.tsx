@@ -22,6 +22,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://get-droply.vercel.app"),
   title: {
     default: "Droply",
     template: "%s | Droply",

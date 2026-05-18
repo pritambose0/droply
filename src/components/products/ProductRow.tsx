@@ -68,22 +68,23 @@ export const ProductRow: React.FC<ProductRowProps> = ({ product }) => {
         </div>
       </div>
 
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button
-          className="w-8 h-8 rounded-lg hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-          title="Preview"
+      <div className="flex items-center gap-2 shrink-0">
+        <Link
+          href={`/products/${product.id}`}
+          className="w-8 h-8 rounded-lg bg-surface hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          title="View"
         >
           <Eye size={16} />
-        </button>
+        </Link>
         <Link
           href={`/seller/products/${product.id}/edit`}
-          className="w-8 h-8 rounded-lg hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="w-8 h-8 rounded-lg bg-surface hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
           title="Edit"
         >
           <Pencil size={16} />
         </Link>
         <button
-          className="w-8 h-8 rounded-lg hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors"
+          className="w-8 h-8 rounded-lg bg-surface hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors"
           title="Delete"
         >
           <Trash2 size={16} />

@@ -48,11 +48,11 @@ export const ProductAPI = {
       totalProducts: number;
     }>
   > => axiosInstance.get("/products", { params }),
-  getById: (id: string): Promise<APIResponse> =>
+  getById: (id: string): Promise<APIResponse<ProductResponseDto>> =>
     axiosInstance.get(`/products/${id}`),
-  update: (id: string, data: UpdateProductDto): Promise<APIResponse> =>
+  updateById: (id: string, data: UpdateProductDto): Promise<APIResponse> =>
     axiosInstance.patch(`/products/${id}`, data),
-  delete: (id: string): Promise<APIResponse> =>
+  deleteById: (id: string): Promise<APIResponse> =>
     axiosInstance.delete(`/products/${id}`),
   getDownloadUrl: (productId: string, orderId: string): Promise<APIResponse> =>
     axiosInstance.get(`/products/${productId}/download`, {

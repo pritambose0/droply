@@ -26,14 +26,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     "from-sky-600/20 to-cyan-600/20",
     "from-fuchsia-600/20 to-purple-600/20",
   ];
-  
+
   // Use a simple hash of the ID to keep the same gradient for the same product
-  const idHash = product.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const idHash = product.id
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const gradient = gradients[idHash % gradients.length];
 
   return (
     <div className="glass rounded-2xl overflow-hidden group hover:border-accent/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 cursor-pointer">
-      <div className={`relative h-40 bg-linear-to-br ${gradient} flex items-center justify-center`}>
+      <div
+        className={`relative h-40 bg-linear-to-br ${gradient} flex items-center justify-center`}
+      >
         {product.thumbnailUrl ? (
           <img
             src={product.thumbnailUrl}
@@ -57,31 +61,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <line x1="12" y1="22.08" x2="12" y2="12" />
           </svg>
         )}
-        
+
         <div className="absolute top-3 right-3">
           <StatusBadge status={product.status} />
-        </div>
-        
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
-          <button
-            className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-            title="Preview"
-          >
-            <Eye size={18} />
-          </button>
-          <Link
-            href={`/seller/products/${product.id}/edit`}
-            className="w-9 h-9 rounded-xl bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-            title="Edit"
-          >
-            <Pencil size={18} />
-          </Link>
-          <button
-            className="w-9 h-9 rounded-xl bg-danger text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-            title="Delete"
-          >
-            <Trash2 size={18} />
-          </button>
         </div>
       </div>
 
@@ -109,7 +91,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-2">
           <span className="text-lg font-bold gradient-text">
             {currencySymbols[product.currency]}
             {product.price?.toLocaleString()}
@@ -120,6 +102,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               : "No sales yet"}
           </span>
         </div>
+      </div>
+
+      {/* Action Bar (Always visible for mobile & desktop UX) */}
+      <div className="px-5 py-3 border-t border-card-border/50 bg-surface/30 flex items-center justify-between">
+        <Link
+          href={`/products/${product.id}`}
+          className="flex flex-1 justify-center items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Eye size={14} /> View
+        </Link>
+        <div className="w-px h-4 bg-card-border/50" />
+        <Link
+          href={`/seller/products/${product.id}/edit`}
+          className="flex flex-1 justify-center items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Pencil size={14} /> Edit
+        </Link>
+        <div className="w-px h-4 bg-card-border/50" />
+        <button className="flex flex-1 justify-center items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-danger transition-colors">
+          <Trash2 size={14} /> Delete
+        </button>
       </div>
     </div>
   );
