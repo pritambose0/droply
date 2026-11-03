@@ -14,6 +14,7 @@ import { ProductSkeleton } from "@/components/products/ProductSkeleton";
 import { EmptyState } from "@/components/products/EmptyState";
 import { NoResults } from "@/components/products/NoResults";
 import { ProductPagination } from "@/components/products/ProductPagination";
+import { DeleteProductModal } from "@/components/products/DeleteProductModal";
 
 export default function ProductsPage() {
   const { getParam, setParams, clearParams } = useQueryParams();
@@ -49,6 +50,31 @@ export default function ProductsPage() {
     page: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Delete Modal State
+  const [productToDelete, setProductToDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteRequest = (id: string, title: string) => {
+    setProductToDelete({ id, title });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await ProductAPI.deleteById(productToDelete.id);
+      setProductToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -139,13 +165,21 @@ export default function ProductsPage() {
         ) : viewMode === "grid" ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {displayProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                onDeleteRequest={handleDeleteRequest}
+              />
             ))}
           </div>
         ) : (
           <div className="space-y-3">
             {displayProducts.map((product) => (
-              <ProductRow key={product.id} product={product} />
+              <ProductRow
+                key={product.id}
+                product={product}
+                onDeleteRequest={handleDeleteRequest}
+              />
             ))}
           </div>
         )}
@@ -159,6 +193,15 @@ export default function ProductsPage() {
           onPageChange={setPage}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteProductModal
+        isOpen={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting}
+        productName={productToDelete?.title || ""}
+      />
     </div>
   );
 }

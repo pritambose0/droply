@@ -64,7 +64,6 @@ export async function DELETE(
     const { productId } = await params;
 
     const session = await getServerSession(authOptions);
-
     if (!session) {
       throw new ApiError(401, "You are not authenticated");
     }

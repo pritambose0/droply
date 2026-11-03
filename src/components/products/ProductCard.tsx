@@ -8,6 +8,12 @@ import { ProductResponseDto } from "@/schemas/productSchema";
 
 interface ProductCardProps {
   product: ProductResponseDto;
+  onDeleteRequest: (
+    id: string,
+    title: string,
+    fileUrl: string,
+    thumbnailUrl: string,
+  ) => void;
 }
 
 const currencySymbols: Record<string, string> = {
@@ -17,7 +23,10 @@ const currencySymbols: Record<string, string> = {
   INR: "₹",
 };
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  onDeleteRequest,
+}) => {
   const gradients = [
     "from-violet-600/20 to-indigo-600/20",
     "from-rose-600/20 to-pink-600/20",
@@ -120,7 +129,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <Pencil size={14} /> Edit
         </Link>
         <div className="w-px h-4 bg-card-border/50" />
-        <button className="flex flex-1 justify-center items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-danger transition-colors">
+        <button
+          onClick={() =>
+            onDeleteRequest(
+              product.id,
+              product.title,
+              product.fileUrl,
+              product.thumbnailUrl,
+            )
+          }
+          className="flex flex-1 justify-center items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-danger transition-colors cursor-pointer"
+        >
           <Trash2 size={14} /> Delete
         </button>
       </div>

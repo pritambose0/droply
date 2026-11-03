@@ -19,6 +19,11 @@ export const createProductSchema = z.object({
   currency: z.enum(SUPPORTED_CURRENCIES),
   fileUrl: z.url("Invalid file URL").trim(),
   thumbnailUrl: z.url("Invalid thumbnail URL").trim(),
+  filePublicId: z.string().min(1, "File Public ID is required").trim(),
+  thumbnailPublicId: z
+    .string()
+    .min(1, "Thumbnail Public ID is required")
+    .trim(),
   status: z.enum(["draft", "published"]).default("published"),
   tags: z
     .union([z.string(), z.array(z.string())])
@@ -65,6 +70,8 @@ export const getAllProductsSchema = z.object({
 export const productFormSchema = createProductSchema.omit({
   fileUrl: true,
   thumbnailUrl: true,
+  filePublicId: true,
+  thumbnailPublicId: true,
 });
 
 export const productResponseSchema = createProductSchema.extend({

@@ -77,7 +77,6 @@ export default function ProductForm({
 
   const {
     uploadFile,
-    deleteFile,
     isLoading: isUploading,
     progress,
     error: uploadError,
@@ -146,16 +145,24 @@ export default function ProductForm({
 
     let thumbnailUrl = initialData?.thumbnailUrl;
     let fileUrl = initialData?.fileUrl;
+    let thumbnailPublicId = initialData?.thumbnailPublicId;
+    let filePublicId = initialData?.filePublicId;
 
     try {
       if (thumbFile) {
         const thumbResult = await uploadFile(thumbFile);
-        if (thumbResult) thumbnailUrl = thumbResult.secureUrl;
+        if (thumbResult) {
+          thumbnailUrl = thumbResult.secureUrl;
+          thumbnailPublicId = thumbResult.publicId;
+        }
       }
 
       if (productFile) {
         const fileResult = await uploadFile(productFile);
-        if (fileResult) fileUrl = fileResult.secureUrl;
+        if (fileResult) {
+          fileUrl = fileResult.secureUrl;
+          filePublicId = fileResult.publicId;
+        }
       }
 
       const commonData = {
@@ -175,6 +182,8 @@ export default function ProductForm({
           ...commonData,
           thumbnailUrl,
           fileUrl,
+          thumbnailPublicId,
+          filePublicId,
         };
 
         const res = await ProductAPI.create(createPayload);
@@ -195,10 +204,12 @@ export default function ProductForm({
         // only update if new file uploaded
         if (thumbnailUrl) {
           updatePayload.thumbnailUrl = thumbnailUrl;
+          updatePayload.thumbnailPublicId = thumbnailPublicId;
         }
 
         if (fileUrl) {
           updatePayload.fileUrl = fileUrl;
+          updatePayload.filePublicId = filePublicId;
         }
 
         const res = await ProductAPI.updateById(initialData._id, updatePayload);

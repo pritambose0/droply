@@ -1,5 +1,7 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { ApiError } from "@/helpers/ApiError";
+import cloudinary from "@/lib/cloudinary";
+import logger from "@/lib/logger";
 import OrderModel from "@/models/Order";
 import ProductModel from "@/models/Product";
 import {
@@ -10,6 +12,8 @@ import {
 import { isValidObjectId } from "mongoose";
 import { getServerSession } from "next-auth";
 
+type CloudinaryResourceType = "image" | "raw" | "video";
+
 export class ProductService {
   static async createProduct(product: CreateProductDto, creatorId: string) {
     const {
@@ -19,6 +23,8 @@ export class ProductService {
       currency,
       fileUrl,
       thumbnailUrl,
+      filePublicId,
+      thumbnailPublicId,
       status,
       tags,
     } = product;
@@ -39,6 +45,8 @@ export class ProductService {
       currency,
       fileUrl,
       thumbnailUrl,
+      filePublicId,
+      thumbnailPublicId,
       status,
       tags,
     });
@@ -125,6 +133,8 @@ export class ProductService {
       currency,
       fileUrl,
       thumbnailUrl,
+      filePublicId,
+      thumbnailPublicId,
       status,
       tags,
     } = product;
@@ -150,6 +160,8 @@ export class ProductService {
       currency,
       fileUrl,
       thumbnailUrl,
+      filePublicId,
+      thumbnailPublicId,
       status,
       tags,
     };
@@ -170,7 +182,9 @@ export class ProductService {
       throw new ApiError(400, "Invalid product ID or creator ID");
     }
 
-    const existingProduct = await ProductModel.findById(productId);
+    const existingProduct = await ProductModel.findById(productId).select(
+      "+fileUrl +thumbnailUrl +filePublicId +thumbnailPublicId",
+    );
 
     if (!existingProduct) {
       throw new ApiError(404, "Product not found");
@@ -180,9 +194,94 @@ export class ProductService {
       throw new ApiError(403, "You are not authorized to delete this product");
     }
 
+    const assets = [
+      {
+        publicId: existingProduct.filePublicId,
+        url: existingProduct.fileUrl,
+        fallbackResourceType: "raw" as CloudinaryResourceType,
+      },
+      {
+        publicId: existingProduct.thumbnailPublicId,
+        url: existingProduct.thumbnailUrl,
+        fallbackResourceType: "image" as CloudinaryResourceType,
+      },
+    ];
+
     await existingProduct.deleteOne();
 
+    await Promise.allSettled(
+      assets.map((asset) =>
+        ProductService.deleteCloudinaryAsset(
+          asset.publicId,
+          asset.url,
+          asset.fallbackResourceType,
+        ),
+      ),
+    );
+
     return;
+  }
+
+  private static getResourceType(
+    url: string,
+    fallback: CloudinaryResourceType,
+  ): CloudinaryResourceType {
+    if (url.includes("/raw/upload/")) return "raw";
+    if (url.includes("/video/upload/")) return "video";
+    if (url.includes("/image/upload/")) return "image";
+    return fallback;
+  }
+
+  private static getFileExtension(url: string): string {
+    try {
+      const pathname = new URL(url).pathname;
+      const lastDot = pathname.lastIndexOf(".");
+      const extension = pathname.slice(lastDot);
+      return lastDot !== -1 && extension.length <= 10 ? extension : "";
+    } catch {
+      return "";
+    }
+  }
+
+  private static async deleteCloudinaryAsset(
+    publicId: string | undefined,
+    url: string,
+    fallbackResourceType: CloudinaryResourceType,
+  ) {
+    if (!publicId) return;
+
+    const resourceType = ProductService.getResourceType(
+      url,
+      fallbackResourceType,
+    );
+
+    let assetId = publicId;
+
+    if (resourceType === "raw") {
+      const extension = ProductService.getFileExtension(url);
+      if (extension && !assetId.endsWith(extension)) {
+        assetId += extension;
+      }
+    }
+
+    try {
+      const result = await cloudinary.uploader.destroy(assetId, {
+        resource_type: resourceType,
+        invalidate: true,
+      });
+
+      if (result.result !== "ok" && result.result !== "not found") {
+        logger.warn(
+          { publicId: assetId, resourceType, result: result.result },
+          "Cloudinary asset deletion was not acknowledged",
+        );
+      }
+    } catch (error) {
+      logger.warn(
+        { err: error, publicId: assetId, resourceType },
+        "Failed to delete Cloudinary asset",
+      );
+    }
   }
 
   static async downloadProduct(

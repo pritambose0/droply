@@ -8,6 +8,12 @@ import { ProductResponseDto } from "@/schemas/productSchema";
 
 interface ProductRowProps {
   product: ProductResponseDto;
+  onDeleteRequest: (
+    id: string,
+    title: string,
+    fileUrl: string,
+    thumbnailUrl: string,
+  ) => void;
 }
 
 const currencySymbols: Record<string, string> = {
@@ -17,7 +23,10 @@ const currencySymbols: Record<string, string> = {
   INR: "₹",
 };
 
-export const ProductRow: React.FC<ProductRowProps> = ({ product }) => {
+export const ProductRow: React.FC<ProductRowProps> = ({
+  product,
+  onDeleteRequest,
+}) => {
   return (
     <div className="glass rounded-xl p-4 flex items-center gap-4 hover:border-accent/20 transition-all group cursor-pointer">
       <div className="w-16 h-16 rounded-xl bg-linear-to-br from-accent/20 to-purple-500/20 flex items-center justify-center shrink-0">
@@ -84,7 +93,15 @@ export const ProductRow: React.FC<ProductRowProps> = ({ product }) => {
           <Pencil size={16} />
         </Link>
         <button
-          className="w-8 h-8 rounded-lg bg-surface hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors"
+          onClick={() =>
+            onDeleteRequest(
+              product.id,
+              product.title,
+              product.fileUrl,
+              product.thumbnailUrl,
+            )
+          }
+          className="w-8 h-8 rounded-lg bg-surface hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors cursor-pointer"
           title="Delete"
         >
           <Trash2 size={16} />

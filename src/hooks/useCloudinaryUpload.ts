@@ -87,7 +87,7 @@ export function useCloudinaryUpload() {
         const msg =
           err.response?.data?.message ||
           err.message ||
-          "Failed to delete image. Please try again.";
+          "Failed to delete file. Please try again.";
         setError(msg);
         return false;
       } finally {
