@@ -14,13 +14,19 @@ import { ApiError } from "@/lib/axios";
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
-  const { register, formState: { errors }, getValues, handleSubmit, setError } = useForm<SendCodeDto>({
+  const {
+    register,
+    formState: { errors },
+    getValues,
+    handleSubmit,
+    setError,
+  } = useForm<SendCodeDto>({
     resolver: zodResolver(sendCodeSchema),
     defaultValues: {
       email: "",
     },
     mode: "onChange",
-  })
+  });
 
   const onSubmit = async (data: SendCodeDto) => {
     setIsLoading(true);
@@ -84,7 +90,9 @@ export default function ForgotPasswordPage() {
             <Key size={40} className="text-accent" />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-foreground mb-2">Forgot password?</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          Forgot password?
+        </h1>
         <p className="text-sm text-muted-foreground">
           No worries. Enter your email and we&apos;ll send you a reset code.
         </p>
@@ -106,14 +114,14 @@ export default function ForgotPasswordPage() {
           <Button
             type="submit"
             id="forgot-submit"
-            disabled={isLoading || !getValues("email")}
+            disabled={isLoading}
             isLoading={isLoading}
             loadingText="Sending..."
           >
             Send Reset Code
           </Button>
         </div>
-      </form >
+      </form>
 
       <div className="mt-6 text-center">
         <Link
