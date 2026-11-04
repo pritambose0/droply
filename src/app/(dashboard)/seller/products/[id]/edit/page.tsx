@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { use } from "react";
 import Link from "next/link";
-import { ProductAPI } from "@/lib/apiClient";
-import { ProductResponseDto } from "@/schemas/productSchema";
 import Button from "@/components/Button";
 import ProductForm from "@/components/products/ProductForm";
 import { Loader2 } from "lucide-react";
+import { useProduct } from "@/hooks/useProducts";
 
 export default function EditProductPage({
   params,
@@ -14,25 +13,7 @@ export default function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const unwrappedParams = use(params);
-  const [product, setProduct] = useState<ProductResponseDto | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      setIsLoading(true);
-      try {
-        const response = await ProductAPI.getById(unwrappedParams.id);
-        if (response.success && response.data) {
-          setProduct(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching product", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [unwrappedParams.id]);
+  const { data: product, isLoading, isError } = useProduct(unwrappedParams.id);
 
   if (isLoading) {
     return (
@@ -45,7 +26,7 @@ export default function EditProductPage({
     );
   }
 
-  if (!product) {
+  if (isError || !product) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
         <h2 className="text-2xl font-bold text-foreground">

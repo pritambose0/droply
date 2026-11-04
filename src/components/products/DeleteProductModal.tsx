@@ -10,6 +10,7 @@ interface DeleteProductModalProps {
   onConfirm: () => void;
   isDeleting: boolean;
   productName: string;
+  error?: string | null;
 }
 
 export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
@@ -18,6 +19,7 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
   onConfirm,
   isDeleting,
   productName,
+  error,
 }) => {
   // Handle escape key
   useEffect(() => {
@@ -78,6 +80,12 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
             ? This action cannot be undone and will permanently remove the
             product from your store.
           </p>
+
+          {error && (
+            <p className="mt-4 rounded-xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
+              {error}
+            </p>
+          )}
 
           {/* Actions */}
           <div className="mt-8 flex items-center justify-end gap-3">

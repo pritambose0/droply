@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQueryParams } from "@/hooks/useQueryParams";
-import { ProductAPI } from "@/lib/apiClient";
-import { ProductResponseDto } from "@/schemas/productSchema";
+import {
+  getApiErrorMessage,
+  useDeleteProduct,
+  useProducts,
+} from "@/hooks/useProducts";
 import { ProductToolbar } from "@/components/products/ProductToolbar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductRow } from "@/components/products/ProductRow";
@@ -32,7 +35,8 @@ export default function ProductsPage() {
   const debouncedSearch = useDebounce(search, 500);
 
   // Get Pagination Params
-  const page = getParam("page", "1");
+  const pageParam = Number(getParam("page", "1"));
+  const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
   // Setters that update the URL
   const setSearch = (val: string) => setParams({ q: val, page: "1" });
@@ -42,67 +46,55 @@ export default function ProductsPage() {
   const setViewMode = (val: "grid" | "list") => setParams({ view: val });
   const setPage = (page: number) => setParams({ page: page.toString() });
 
-  // Data State
-  const [productResponse, setProductResponse] = useState<{
-    products: ProductResponseDto[];
-    totalProducts: number;
-    totalPages: number;
-    page: number;
-  } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryParams = useMemo(
+    () => ({
+      status: statusFilter,
+      query: debouncedSearch,
+      sortBy,
+      sortOrder: "desc" as const,
+      page,
+      limit: 9,
+    }),
+    [statusFilter, debouncedSearch, sortBy, page],
+  );
+
+  const {
+    data: productResponse,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useProducts(queryParams);
+
+  const deleteProduct = useDeleteProduct();
 
   // Delete Modal State
   const [productToDelete, setProductToDelete] = useState<{
     id: string;
     title: string;
   } | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleDeleteRequest = (id: string, title: string) => {
+    setDeleteError(null);
     setProductToDelete({ id, title });
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!productToDelete) return;
 
-    setIsDeleting(true);
-    try {
-      await ProductAPI.deleteById(productToDelete.id);
-      setProductToDelete(null);
-    } catch (error) {
-      console.error("Failed to delete product:", error);
-    } finally {
-      setIsDeleting(false);
-    }
+    setDeleteError(null);
+    deleteProduct.mutate(productToDelete.id, {
+      onSuccess: () => setProductToDelete(null),
+      onError: (err) =>
+        setDeleteError(
+          getApiErrorMessage(
+            err,
+            "Failed to delete product. Please try again.",
+          ),
+        ),
+    });
   };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await ProductAPI.getAll({
-          status: statusFilter,
-          query: debouncedSearch,
-          sortBy: sortBy,
-          sortOrder: "desc",
-          page: Number(page),
-          limit: 9,
-        });
-        if (response.success && response.data) {
-          setProductResponse(response.data);
-        } else {
-          setProductResponse(null);
-          console.error("Error fetching products", response);
-        }
-      } catch (error) {
-        setProductResponse(null);
-        console.error("Error fetching products", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProducts();
-  }, [statusFilter, debouncedSearch, sortBy, page]);
 
   const displayProducts = productResponse?.products || [];
   const totalCount = productResponse?.totalProducts || 0;
@@ -142,7 +134,26 @@ export default function ProductsPage() {
 
       {/* Main Content Area */}
       <div className="min-h-[60vh]">
-        {isLoading ? (
+        {isError && !productResponse ? (
+          <div className="glass rounded-3xl p-16 text-center border border-danger/20 flex flex-col items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-danger/10 text-danger flex items-center justify-center mb-4">
+              <RefreshCw size={24} />
+            </div>
+            <h3 className="text-lg font-bold text-foreground mb-1">
+              Couldn&apos;t load products
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              {getApiErrorMessage(error, "Please try again in a moment.")}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-accent/90 transition-all"
+            >
+              <RefreshCw size={16} />
+              Try again
+            </button>
+          </div>
+        ) : isLoading ? (
           viewMode === "grid" ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {[...Array(9)].map((_, i) => (
@@ -199,8 +210,9 @@ export default function ProductsPage() {
         isOpen={!!productToDelete}
         onClose={() => setProductToDelete(null)}
         onConfirm={handleConfirmDelete}
-        isDeleting={isDeleting}
+        isDeleting={deleteProduct.isPending}
         productName={productToDelete?.title || ""}
+        error={deleteError}
       />
     </div>
   );

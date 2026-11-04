@@ -26,18 +26,25 @@ import Input from "@/components/Input";
 import PreviewModal from "@/components/PreviewModal";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
-import { ProductAPI } from "@/lib/apiClient";
+import {
+  getApiErrorMessage,
+  useCreateProduct,
+  useUpdateProduct,
+} from "@/hooks/useProducts";
 import { UPLOAD_CONFIG } from "@/constants/fileUpload";
 import {
   CreateProductDto,
   productFormSchema,
   ProductFormSchema,
+  ProductResponseDto,
   UpdateProductDto,
 } from "@/schemas/productSchema";
 
+type ProductFormData = ProductResponseDto & { _id?: string };
+
 interface ProductFormProps {
   mode?: "create" | "edit";
-  initialData?: any;
+  initialData?: ProductFormData;
 }
 
 export default function ProductForm({
@@ -74,6 +81,8 @@ export default function ProductForm({
   const [showPreview, setShowPreview] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [removedThumbnail, setRemovedThumbnail] = useState(false);
+  const [removedFile, setRemovedFile] = useState(false);
 
   const {
     uploadFile,
@@ -81,6 +90,11 @@ export default function ProductForm({
     progress,
     error: uploadError,
   } = useCloudinaryUpload();
+
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+  const isSaving =
+    isUploading || createProduct.isPending || updateProduct.isPending;
 
   // Auto-dismiss success message
   useEffect(() => {
@@ -151,18 +165,20 @@ export default function ProductForm({
     try {
       if (thumbFile) {
         const thumbResult = await uploadFile(thumbFile);
-        if (thumbResult) {
-          thumbnailUrl = thumbResult.secureUrl;
-          thumbnailPublicId = thumbResult.publicId;
+        if (!thumbResult) {
+          throw new Error("Thumbnail upload failed. Please try again.");
         }
+        thumbnailUrl = thumbResult.secureUrl;
+        thumbnailPublicId = thumbResult.publicId;
       }
 
       if (productFile) {
         const fileResult = await uploadFile(productFile);
-        if (fileResult) {
-          fileUrl = fileResult.secureUrl;
-          filePublicId = fileResult.publicId;
+        if (!fileResult) {
+          throw new Error("Product file upload failed. Please try again.");
         }
+        fileUrl = fileResult.secureUrl;
+        filePublicId = fileResult.publicId;
       }
 
       const commonData = {
@@ -178,6 +194,10 @@ export default function ProductForm({
       };
 
       if (mode === "create") {
+        if (!thumbnailUrl || !fileUrl || !thumbnailPublicId || !filePublicId) {
+          throw new Error("Please upload both a thumbnail and a product file.");
+        }
+
         const createPayload: CreateProductDto = {
           ...commonData,
           thumbnailUrl,
@@ -186,19 +206,17 @@ export default function ProductForm({
           filePublicId,
         };
 
-        const res = await ProductAPI.create(createPayload);
-
-        if (!res.success) {
-          throw new Error(res.message || "Failed to create product.");
-        }
+        await createProduct.mutateAsync(createPayload);
       } else {
-        if (!initialData?._id) {
+        const productId = initialData?.id ?? initialData?._id;
+
+        if (!productId) {
           throw new Error("Product ID not found.");
         }
 
         const updatePayload: UpdateProductDto = {
           ...commonData,
-          productId: initialData._id,
+          productId,
         };
 
         // only update if new file uploaded
@@ -212,11 +230,7 @@ export default function ProductForm({
           updatePayload.filePublicId = filePublicId;
         }
 
-        const res = await ProductAPI.updateById(initialData._id, updatePayload);
-
-        if (!res.success) {
-          throw new Error(res.message || "Failed to update product.");
-        }
+        await updateProduct.mutateAsync({ id: productId, data: updatePayload });
       }
 
       setSubmitSuccess(true);
@@ -226,15 +240,18 @@ export default function ProductForm({
       }
 
       router.push("/seller/products");
-    } catch (err: any) {
+    } catch (err) {
       setSubmitError(
-        err.response?.data?.message || err.message || "Something went wrong.",
+        getApiErrorMessage(err, "Something went wrong. Please try again."),
       );
     }
   };
 
   const formValues = watch();
-  const displayThumbnail = thumbPreview || initialData?.thumbnailUrl;
+  const displayThumbnail =
+    thumbPreview || (!removedThumbnail ? initialData?.thumbnailUrl : undefined);
+  const displayProductFile =
+    productFileName || (!removedFile ? initialData?.fileUrl : undefined);
 
   return (
     <>
@@ -301,7 +318,7 @@ export default function ProductForm({
                 onClick={() => setShowPreview(true)}
                 className="px-4 py-2"
                 type="button"
-                disabled={isUploading}
+                disabled={isSaving}
               >
                 Preview
               </Button>
@@ -314,7 +331,7 @@ export default function ProductForm({
                   }}
                   className="px-4 py-2"
                   type="button"
-                  disabled={isUploading}
+                  disabled={isSaving}
                 >
                   Unpublish
                 </Button>
@@ -327,7 +344,7 @@ export default function ProductForm({
                   }}
                   className="px-4 py-2"
                   type="button"
-                  disabled={isUploading}
+                  disabled={isSaving}
                 >
                   Save Draft
                 </Button>
@@ -339,8 +356,10 @@ export default function ProductForm({
                 }}
                 className="px-4 py-2"
                 type="submit"
-                isLoading={isUploading}
-                loadingText={`Saving… ${progress}%`}
+                isLoading={isSaving}
+                loadingText={
+                  isUploading ? `Saving… ${progress}%` : "Saving…"
+                }
               >
                 <Save size={16} />
                 {mode === "edit" ? "Save Changes" : "Publish"}
@@ -477,7 +496,7 @@ export default function ProductForm({
                     variant="none"
                     onClick={() => {
                       removeThumb();
-                      if (initialData) initialData.thumbnailUrl = "";
+                      setRemovedThumbnail(true);
                     }}
                     className="absolute top-3 right-3 p-0 w-9 h-9 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/70 hover:text-white hover:bg-danger/20 hover:border-danger/30 transition-all flex items-center justify-center shadow-2xl group/remove"
                   >
@@ -554,7 +573,7 @@ export default function ProductForm({
                 }}
               />
 
-              {productFileName || initialData?.fileUrl ? (
+              {displayProductFile ? (
                 <div className="p-3 rounded-xl bg-surface border border-card-border flex items-center justify-between group animate-fade-in mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
@@ -572,7 +591,7 @@ export default function ProductForm({
                     variant="none"
                     onClick={() => {
                       removeProductFile();
-                      if (initialData) initialData.fileUrl = "";
+                      setRemovedFile(true);
                     }}
                     className="text-xs text-muted-foreground hover:text-danger transition-colors"
                   >
