@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Download,
   Shield,
@@ -42,7 +42,15 @@ const product = {
   },
 };
 
-const relatedProducts: any[] = [];
+interface RelatedProduct {
+  id: string;
+  name: string;
+  creator: string;
+  icon: ReactNode;
+  price: number;
+}
+
+const relatedProducts: RelatedProduct[] = [];
 
 
 type TabKey = "description" | "includes" | "tech";
@@ -103,7 +111,7 @@ function ContentTabs({
 function RelatedProductCard({
   product,
 }: {
-  product: (typeof relatedProducts)[0];
+  product: RelatedProduct;
 }) {
   return (
     <Link
@@ -192,7 +200,6 @@ function PurchaseCard({
 ───────────────────────────────────────────────── */
 export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("description");
-  const [wishlisted, setWishlisted] = useState(false);
   const [purchased, setPurchased] = useState(false);
 
   // In a real MVP, we would fetch product by ID here

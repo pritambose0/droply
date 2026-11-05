@@ -1,63 +1,129 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 interface UseResendTimerProps {
   keyPrefix: string;
   identifier: string | null;
 }
 
+type Listener = () => void;
+
+const storageListeners = new Set<Listener>();
+
+function subscribeToStorage(listener: Listener) {
+  storageListeners.add(listener);
+
+  let handleStorage: (() => void) | null = null;
+
+  if (typeof window !== "undefined") {
+    handleStorage = () => {
+      cachedNow = Date.now();
+      listener();
+    };
+    window.addEventListener("storage", handleStorage);
+  }
+
+  return () => {
+    storageListeners.delete(listener);
+
+    if (typeof window !== "undefined" && handleStorage) {
+      window.removeEventListener("storage", handleStorage);
+    }
+  };
+}
+
+function notifyStorage() {
+  cachedNow = Date.now();
+  storageListeners.forEach((listener) => listener());
+}
+
+let cachedNow = typeof Date !== "undefined" ? Date.now() : 0;
+let ticker: ReturnType<typeof setInterval> | null = null;
+const tickListeners = new Set<Listener>();
+
+function subscribeToTick(listener: Listener) {
+  tickListeners.add(listener);
+
+  if (ticker === null) {
+    cachedNow = Date.now();
+    ticker = setInterval(() => {
+      cachedNow = Date.now();
+      tickListeners.forEach((tickListener) => tickListener());
+    }, 1000);
+  }
+
+  listener();
+
+  return () => {
+    tickListeners.delete(listener);
+
+    if (tickListeners.size === 0 && ticker !== null) {
+      clearInterval(ticker);
+      ticker = null;
+    }
+  };
+}
+
+function subscribeToNothing() {
+  return () => {};
+}
+
+function getNow() {
+  return cachedNow;
+}
+
+function getServerNow() {
+  return 0;
+}
+
 export function useResendTimer({ keyPrefix, identifier }: UseResendTimerProps) {
-  const [countdown, setCountdown] = useState(0);
+  const storageKey = identifier ? `${keyPrefix}:${identifier}` : null;
 
-  // Helper to strictly generate the identical key everywhere
-  const getStorageKey = useCallback(() => {
-    if (!identifier) return null;
-    return `${keyPrefix}:${identifier}`;
-  }, [keyPrefix, identifier]);
+  const readExpiry = useCallback(() => {
+    if (typeof window === "undefined" || !storageKey) return null;
 
-  // 1. Initialization Effect: Runs once on mount when identifier is ready
-  useEffect(() => {
-    const key = getStorageKey();
-    if (!key) return;
+    const storedExpiry = localStorage.getItem(storageKey);
+    if (!storedExpiry) return null;
 
-    const storedExpiry = localStorage.getItem(key);
-    if (storedExpiry) {
-      const remainingTime = Math.round((parseInt(storedExpiry) - Date.now()) / 1000);
-      if (remainingTime > 0) {
-        setCountdown(remainingTime);
-      } else {
-        localStorage.removeItem(key);
-      }
-    }
-  }, [getStorageKey]);
+    const expiry = Number(storedExpiry);
+    return Number.isFinite(expiry) ? expiry : null;
+  }, [storageKey]);
 
-  // 2. The Tick Effect: Handles the countdown every second
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer); // Cleanup prevents memory leaks!
-    }
-  }, [countdown]);
+  const expiry = useSyncExternalStore(
+    subscribeToStorage,
+    readExpiry,
+    () => null,
+  );
 
-  // 3. The API exposed to your components
+  const shouldTick = expiry !== null && expiry > cachedNow;
+
+  const now = useSyncExternalStore(
+    shouldTick ? subscribeToTick : subscribeToNothing,
+    getNow,
+    getServerNow,
+  );
+
+  const countdown =
+    expiry !== null && expiry > now
+      ? Math.max(0, Math.ceil((expiry - now) / 1000))
+      : 0;
+
   const startCountdown = useCallback(
     (seconds: number) => {
-      const key = getStorageKey();
-      if (!key) return;
+      if (!storageKey) return;
 
       const expiry = Date.now() + seconds * 1000;
-      localStorage.setItem(key, expiry.toString());
-      setCountdown(seconds);
+      localStorage.setItem(storageKey, expiry.toString());
+      notifyStorage();
     },
-    [getStorageKey]
+    [storageKey],
   );
 
   const clearTimer = useCallback(() => {
-    const key = getStorageKey();
-    if (!key) return;
+    if (!storageKey) return;
 
-    localStorage.removeItem(key);
-    setCountdown(0);
-  }, [getStorageKey]);
+    localStorage.removeItem(storageKey);
+    notifyStorage();
+  }, [storageKey]);
 
   return {
     countdown,

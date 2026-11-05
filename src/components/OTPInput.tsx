@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import Input from "./Input";
 
 interface OTPInputProps {
@@ -16,16 +16,14 @@ export default function OTPInput({
   length = 6,
   error,
 }: OTPInputProps) {
-  const [digits, setDigits] = useState<string[]>(new Array(length).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  useEffect(() => {
+  const digits = useMemo(() => {
     const newDigits = value.split("").slice(0, length);
-    const paddedDigits = [
+    return [
       ...newDigits,
       ...new Array(length - newDigits.length).fill(""),
     ];
-    setDigits(paddedDigits);
   }, [value, length]);
 
   const handleChange = (index: number, val: string) => {

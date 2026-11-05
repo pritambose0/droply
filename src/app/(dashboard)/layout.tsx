@@ -13,9 +13,7 @@ import {
   LogOut, 
   Menu, 
   X,
-  Droplet,
-  Star,
-  Wallet
+  Droplet
 } from "lucide-react";
 
 function DroplyLogo() {

@@ -18,7 +18,7 @@ export interface IUserMethods {
   compareVerificationCode(candidateVerificationCode: string): Promise<boolean>;
 }
 
-type UserModelType = mongoose.Model<IUser, {}, IUserMethods>;
+type UserModelType = mongoose.Model<IUser, Record<string, never>, IUserMethods>;
 
 const UserSchema = new Schema<IUser, UserModelType, IUserMethods>({
   name: {

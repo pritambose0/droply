@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { Camera, Shield, Bell, Moon, Sun, Monitor, Globe, Download, Trash2, Smartphone, Mail, GitBranchPlusIcon, Key } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 // --- Reusable UI Components ---
 
-function SettingsSectionCard({ title, description, children, icon: Icon }: { title: string, description?: string, children: React.ReactNode, icon?: any }) {
+function SettingsSectionCard({ title, description, children, icon: Icon }: { title: string, description?: string, children: React.ReactNode, icon?: LucideIcon }) {
   return (
     <div className="glass rounded-2xl overflow-hidden border border-card-border/60">
       <div className="p-6 md:p-8 border-b border-card-border/40">
@@ -51,7 +52,15 @@ function ToggleRow({ title, description, checked, onChange }: { title: string, d
   );
 }
 
-function InputField({ label, type = "text", placeholder, defaultValue, readOnly }: any) {
+interface InputFieldProps {
+  label: string;
+  type?: string;
+  placeholder?: string;
+  defaultValue?: string;
+  readOnly?: boolean;
+}
+
+function InputField({ label, type = "text", placeholder, defaultValue, readOnly }: InputFieldProps) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-foreground">{label}</label>
@@ -189,7 +198,7 @@ export default function GlobalSettingsPage() {
                     <div className="flex items-center gap-4">
                       <Monitor className="text-muted-foreground" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-foreground">MacBook Pro 16"</p>
+                        <p className="text-sm font-medium text-foreground">MacBook Pro 16&quot;</p>
                         <p className="text-xs text-muted-foreground">San Francisco, CA • Current Session</p>
                       </div>
                     </div>

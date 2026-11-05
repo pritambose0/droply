@@ -1,4 +1,5 @@
 import { ShieldCheck, Package, Download, Zap, BarChart3, Globe } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 function FeatureCard({
   icon: Icon,
@@ -6,7 +7,7 @@ function FeatureCard({
   description,
   delay,
 }: {
-  icon: any;
+  icon: LucideIcon;
   title: string;
   description: string;
   delay: string;

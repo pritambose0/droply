@@ -26,7 +26,7 @@ export default function CheckoutPendingPage() {
         <div className="glass rounded-2xl p-6 border border-card-border flex flex-col items-center gap-4 text-center">
            <Mail className="text-muted-foreground" size={32} />
            <div>
-             <p className="text-sm font-bold text-foreground">We'll email your receipt</p>
+             <p className="text-sm font-bold text-foreground">We&apos;ll email your receipt</p>
              <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto leading-relaxed">
                You can safely leave this page. Once the payment clears, we will automatically send you an email receipt and add the product to your library.
              </p>

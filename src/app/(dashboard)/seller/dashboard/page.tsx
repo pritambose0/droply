@@ -14,9 +14,15 @@ import {
 
 /* ─── Data ─── */
 
-const REVENUE_DATA: any[] = [];
+interface RecentOrder {
+  id: string;
+  product: string;
+  buyer: string;
+  status: string;
+  amount: number;
+}
 
-const RECENT_ORDERS: any[] = [];
+const RECENT_ORDERS: RecentOrder[] = [];
 
 const KPIS = [
   {

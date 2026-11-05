@@ -38,7 +38,7 @@ export default function RefundsPage() {
             <section>
               <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">1. Nature of Digital Products</h2>
               <p>
-                Unlike physical goods, digital products cannot be "returned." Once a file is downloaded or accessed, the buyer has received the full value of the purchase. Therefore, we do not offer refunds for "buyer's remorse" or situations where the buyer simply changed their mind.
+                Unlike physical goods, digital products cannot be &quot;returned.&quot; Once a file is downloaded or accessed, the buyer has received the full value of the purchase. Therefore, we do not offer refunds for &quot;buyer&apos;s remorse&quot; or situations where the buyer simply changed their mind.
               </p>
             </section>
 
@@ -50,7 +50,7 @@ export default function RefundsPage() {
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong className="text-foreground">Major Defects:</strong> The product is fundamentally broken, severely corrupted, or lacks critical features advertised on the product page, and the creator is unable to resolve the issue.</li>
                 <li><strong className="text-foreground">Misrepresentation:</strong> The product delivered is significantly different from its description or previews.</li>
-                <li><strong className="text-foreground">Creator Guarantee:</strong> The creator explicitly offers a money-back guarantee (e.g., "30-Day Money-Back") on their product page. We enforce these guarantees.</li>
+                <li><strong className="text-foreground">Creator Guarantee:</strong> The creator explicitly offers a money-back guarantee (e.g., &quot;30-Day Money-Back&quot;) on their product page. We enforce these guarantees.</li>
               </ul>
             </section>
 
@@ -77,7 +77,7 @@ export default function RefundsPage() {
             <section>
               <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">5. Failed Deliveries</h2>
               <p>
-                If a technical glitch on Droply's end prevents you from accessing or downloading your purchased product, and our support team cannot resolve the issue within 48 hours, you are entitled to a full refund.
+                If a technical glitch on Droply&apos;s end prevents you from accessing or downloading your purchased product, and our support team cannot resolve the issue within 48 hours, you are entitled to a full refund.
               </p>
             </section>
 

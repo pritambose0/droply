@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -18,7 +18,17 @@ import {
 
 /* ──────────── Components ──────────── */
 
-function PurchaseCardGrid({ purchase }: { purchase: any }) {
+interface Purchase {
+  id: string;
+  productName: string;
+  creatorName: string;
+  image: string;
+  icon: ReactNode;
+  purchasedAt: string;
+  price: number;
+}
+
+function PurchaseCardGrid({ purchase }: { purchase: Purchase }) {
   return (
     <div className="glass rounded-2xl overflow-hidden group hover:border-accent/30 transition-all duration-300 hover:shadow-xl hover:shadow-accent/5 flex flex-col h-full border border-card-border/60">
       {/* Thumbnail */}
@@ -60,7 +70,7 @@ function PurchaseCardGrid({ purchase }: { purchase: any }) {
   );
 }
 
-function PurchaseRowList({ purchase }: { purchase: any }) {
+function PurchaseRowList({ purchase }: { purchase: Purchase }) {
   return (
     <div className="glass rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-5 hover:border-accent/30 transition-all group border border-card-border/60">
       {/* Thumbnail */}
@@ -100,9 +110,9 @@ export default function BuyerLibraryPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState("newest");
 
-  const purchases: any[] = []; // Real wiring would go here
+  const purchases: Purchase[] = []; // Real wiring would go here
 
-  let filteredPurchases = purchases.filter(p =>
+  const filteredPurchases = purchases.filter(p =>
   (p.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.creatorName.toLowerCase().includes(searchQuery.toLowerCase()))
   );

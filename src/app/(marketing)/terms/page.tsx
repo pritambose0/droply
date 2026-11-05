@@ -53,7 +53,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-xl md:text-2xl font-bold text-foreground mb-4">4. Buyer Responsibilities</h2>
               <p>
-                Buyers are expected to use purchased digital products in accordance with the specific license provided by the creator. Redistribution, reselling, or unauthorized sharing of purchased products is strictly prohibited unless explicitly allowed by the creator's license.
+                Buyers are expected to use purchased digital products in accordance with the specific license provided by the creator. Redistribution, reselling, or unauthorized sharing of purchased products is strictly prohibited unless explicitly allowed by the creator&apos;s license.
               </p>
             </section>
 

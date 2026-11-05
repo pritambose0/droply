@@ -27,7 +27,7 @@ export default function CheckoutCancelPage() {
            <div>
              <p className="text-sm font-bold text-foreground">What happened?</p>
              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-               You either manually exited the checkout flow, or your payment provider declined the transaction. The product is still available in the marketplace if you'd like to try again using a different payment method.
+               You either manually exited the checkout flow, or your payment provider declined the transaction. The product is still available in the marketplace if you&apos;d like to try again using a different payment method.
              </p>
            </div>
         </div>

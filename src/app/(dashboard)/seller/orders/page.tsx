@@ -5,7 +5,6 @@ import {
   Search,
   ChevronDown,
   ExternalLink,
-  Download,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -14,7 +13,18 @@ import {
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 
 /* ──────────── Order Data ──────────── */
-const orders: any[] = []; 
+interface Order {
+  id: string;
+  productName: string;
+  buyerName: string;
+  createdAt: string;
+  currency: string;
+  price: number;
+  paymentStatus: string;
+  orderStatus: string;
+}
+
+const orders: Order[] = []; 
 
 const currencySymbols: Record<string, string> = {
   USD: "$",
@@ -24,7 +34,7 @@ const currencySymbols: Record<string, string> = {
 };
 
 /* ──────────── Order Row ──────────── */
-function OrderRow({ order }: { order: any }) {
+function OrderRow({ order }: { order: Order }) {
   const date = new Date(order.createdAt);
   const timeAgo = getTimeAgo(date);
 

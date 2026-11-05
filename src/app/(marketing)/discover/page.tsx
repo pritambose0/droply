@@ -1,19 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
-import { Search, X, Filter, TrendingUp, Download, Users, Package, ShoppingBag } from "lucide-react";
+import { useState, useMemo, type ReactNode } from "react";
+import { Search, X, Filter, TrendingUp, ShoppingBag } from "lucide-react";
 
 // --- Products ---
 
-const products: any[] = []; // Real wiring would go here
+interface Product {
+  id: string;
+  name: string;
+  creator: string;
+  image: string;
+  icon: ReactNode;
+  tag: string;
+  sales: number;
+  price: number;
+}
+
+const products: Product[] = []; // Real wiring would go here
 
 const CATEGORIES = ["All", "Code", "EBook", "Design", "Video", "Templates"];
 const SORT_OPTIONS = ["Popular", "Newest", "Price: Low to High", "Price: High to Low"];
 
 // --- Components ---
 
-function ProductCard({ product }: { product: any }) {
+function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group glass rounded-2xl overflow-hidden flex flex-col hover:-translate-y-1 transition-all duration-300 hover:shadow-xl hover:shadow-accent/10 border border-card-border/60">
       {/* Thumbnail Area */}
@@ -231,7 +242,7 @@ export default function DiscoverPage() {
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-2">No products found</h3>
               <p className="text-muted-foreground max-w-md mx-auto mb-8">
-                We couldn't find anything matching "{searchQuery}". Try adjusting your search or filters.
+                We couldn&apos;t find anything matching &quot;{searchQuery}&quot;. Try adjusting your search or filters.
               </p>
               <button onClick={() => { setSearchQuery(""); setActiveCategory("All"); setPriceFilter("all"); }} className="px-6 py-3 rounded-xl bg-surface border border-card-border text-foreground font-medium hover:bg-surface-hover transition-colors">
                 Clear all filters

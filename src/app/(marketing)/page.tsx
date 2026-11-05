@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Zap, Globe, Star } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, Globe } from "lucide-react";
 
 const FEATURES = [
   {
@@ -20,8 +20,6 @@ const FEATURES = [
     desc: "Reach buyers worldwide. Multi-currency support with automated payouts to your bank.",
   },
 ];
-
-const TESTIMONIALS: any[] = [];
 
 export default function HomePage() {
   return (

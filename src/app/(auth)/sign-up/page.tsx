@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { User, Mail, Lock, Eye, EyeOff, Check, Loader2 } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterUserDto, signupSchema } from "@/schemas/authSchema";

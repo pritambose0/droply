@@ -1,24 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { User, Bell, Shield, Check, Loader2 } from "lucide-react";
+import { User, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export default function BuyerSettingsPage() {
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<"profile">("profile");
+  const [activeTab] = useState<"profile">("profile");
   const [isLoading, setIsLoading] = useState(false);
 
   // Profile State
   const [name, setName] = useState(session?.user?.name || "John Doe");
   const [email, setEmail] = useState(session?.user?.email || "johndoe@example.com");
-
-  // Notification State
-  const [notifications, setNotifications] = useState({
-    orderUpdates: true,
-    promotions: false,
-    newProducts: true,
-  });
 
   const handleSave = async () => {
     setIsLoading(true);

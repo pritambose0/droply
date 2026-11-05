@@ -3,7 +3,7 @@
 import { X, Tag, ShoppingCart, Info, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import Button from "./Button";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
 interface PreviewModalProps {
@@ -18,20 +18,25 @@ interface PreviewModalProps {
   };
 }
 
+const subscribeToMount = () => () => {};
+const mountedSnapshot = () => true;
+const serverMountedSnapshot = () => false;
+
 export default function PreviewModal({
   isOpen,
   onClose,
   data,
 }: PreviewModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    subscribeToMount,
+    mountedSnapshot,
+    serverMountedSnapshot,
+  );
 
   useEffect(() => {
-    setMounted(true);
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    if (!isOpen) return;
+
+    document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "unset";
     };

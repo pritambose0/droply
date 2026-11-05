@@ -12,6 +12,16 @@ import {
 
 /* ──────────── Components ──────────── */
 
+interface Order {
+  id: string;
+  productName: string;
+  creatorName: string;
+  date: string;
+  amount: number;
+  paymentMethod: string;
+  status: string;
+}
+
 function StatusBadge({ status }: { status: string }) {
   if (status === "completed") {
     return <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success/10 text-success text-[10px] font-bold uppercase tracking-wider"><CheckCircle2 size={12} /> Paid</span>;
@@ -24,7 +34,7 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function BuyerOrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const orders: any[] = []; // Real wiring would go here
+  const orders: Order[] = []; // Real wiring would go here
 
   const filteredOrders = orders.filter(o =>
     o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||

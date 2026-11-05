@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 
 export default function SellerSettingsPage() {
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<"profile">("profile");
+  const [activeTab] = useState<"profile">("profile");
   const [isLoading, setIsLoading] = useState(false);
 
   // Profile State
