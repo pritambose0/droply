@@ -19,7 +19,7 @@ Creators list and sell digital products. Buyers discover, purchase, and download
 
 ### Authentication & Security
 - Credential-based authentication powered by **NextAuth.js** (JWT strategy)
-- Email verification with **6-digit OTP** via SendGrid
+- Email verification with **6-digit OTP** via Resend
 - Password & OTP hashing with **bcrypt**
 - Forgot / reset password flow with OTP verification
 - Rate-limited OTP attempts (max 5 attempts, 10-minute expiry)
@@ -56,7 +56,7 @@ Creators list and sell digital products. Buyers discover, purchase, and download
 | **Database**   | [MongoDB](https://www.mongodb.com/) + Mongoose 9      |
 | **Auth**       | [NextAuth.js v4](https://next-auth.js.org/) (JWT)     |
 | **Validation** | [Zod 4](https://zod.dev/)                             |
-| **Email**      | [SendGrid](https://sendgrid.com/) + React Email       |
+| **Email**      | [Resend](https://resend.com/) + React Email           |
 | **Logging**    | [Pino](https://getpino.io/) + pino-pretty             |
 | **Runtime**    | React 19 · Node.js ≥ 18                               |
 
@@ -146,7 +146,7 @@ droply/
 │   │   ├── ApiError.ts              #   Custom operational error class
 │   │   ├── ApiResponse.ts           #   Standardized response class
 │   │   ├── handleRequest.ts         #   Centralized route error handler
-│   │   ├── sendEmail.ts             #   SendGrid email wrapper
+│   │   ├── sendEmail.ts             #   Resend email wrapper
 │   │   ├── generateOTP.ts           #   Cryptographic OTP generator
 │   │   └── validate.ts              #   Zod validation helper
 │   ├── lib/                         # Core infrastructure
@@ -182,7 +182,7 @@ droply/
 - **Node.js** ≥ 18
 - **pnpm** (recommended) — `npm install -g pnpm`
 - **MongoDB** instance ([Atlas free tier](https://www.mongodb.com/atlas) or local)
-- **SendGrid** account with a [verified sender](https://docs.sendgrid.com/ui/sending-email/sender-verification)
+- **Resend** account with a [verified domain or sender](https://resend.com/docs/dashboard/domains/introduction)
 
 ### Installation
 
@@ -214,8 +214,8 @@ Create a `.env` file in the project root with the following variables:
 | `MONGODB_URI`         | MongoDB connection string                      | ✅        |
 | `NODE_ENV`            | `development` or `production`                  | ✅        |
 | `NEXTAUTH_SECRET`     | Random secret for JWT signing                  | ✅        |
-| `SENDGRID_API_KEY`    | SendGrid API key for transactional emails      | ✅        |
-| `SENDGRID_FROM_EMAIL` | Verified sender email address in SendGrid      | ✅        |
+| `RESEND_API_KEY`      | Resend API key for transactional emails        | ✅        |
+| `RESEND_FROM_EMAIL`   | Verified sender email address in Resend        | ✅        |
 
 > **Tip:** Generate a secure `NEXTAUTH_SECRET` with: `openssl rand -base64 32`
 
