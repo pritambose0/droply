@@ -39,6 +39,11 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   return handleRequest(async () => {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      throw new ApiError(401, "You are not authenticated");
+    }
+
     const { searchParams } = new URL(request.url);
     const body = {
       page: Number(searchParams.get("page") || 1),
@@ -51,7 +56,10 @@ export async function GET(request: Request) {
 
     const validatedBody = validate(getAllProductsSchema, body);
 
-    const products = await ProductService.getAllProducts(validatedBody);
+    const products = await ProductService.getAllProducts(
+      validatedBody,
+      session.user.id,
+    );
 
     return NextResponse.json(
       new ApiResponse(200, "Products fetched successfully", products),

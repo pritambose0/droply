@@ -54,10 +54,10 @@ export class ProductService {
     return newProduct;
   }
 
-  static async getAllProducts(product: GetAllProductsDto) {
+  static async getAllProducts(product: GetAllProductsDto, creatorId: string) {
     const { page, limit, query, sortBy, sortOrder, status } = product;
 
-    const filter: Record<string, unknown> = {};
+    const filter: Record<string, unknown> = { creatorId };
 
     if (status && status !== "all") {
       filter.status = status;
@@ -166,11 +166,11 @@ export class ProductService {
       tags,
     };
 
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value !== undefined) {
-        (existingProduct as any)[key] = value;
-      }
-    });
+    const filteredUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([, value]) => value !== undefined),
+    );
+
+    existingProduct.set(filteredUpdates);
 
     await existingProduct.save();
 

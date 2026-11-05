@@ -85,7 +85,11 @@ export default function ProductsPage() {
 
     setDeleteError(null);
     deleteProduct.mutate(productToDelete.id, {
-      onSuccess: () => setProductToDelete(null),
+      onSuccess: () => {
+        setProductToDelete(null);
+        const remainingOnPage = (productResponse?.products?.length ?? 1) - 1;
+        if (remainingOnPage === 0 && page > 1) setPage(page - 1);
+      },
       onError: (err) =>
         setDeleteError(
           getApiErrorMessage(

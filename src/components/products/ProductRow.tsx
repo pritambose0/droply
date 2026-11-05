@@ -8,12 +8,7 @@ import { ProductResponseDto } from "@/schemas/productSchema";
 
 interface ProductRowProps {
   product: ProductResponseDto;
-  onDeleteRequest: (
-    id: string,
-    title: string,
-    fileUrl: string,
-    thumbnailUrl: string,
-  ) => void;
+  onDeleteRequest: (id: string, title: string) => void;
 }
 
 const currencySymbols: Record<string, string> = {
@@ -56,7 +51,7 @@ export const ProductRow: React.FC<ProductRowProps> = ({
           {product.description}
         </p>
         <div className="flex gap-1.5 mt-1.5">
-          {product.tags.slice(0, 4).map((tag: any) => (
+          {product.tags.slice(0, 4).map((tag) => (
             <span
               key={tag}
               className="px-1.5 py-0.5 rounded bg-surface text-[10px] text-muted-foreground"
@@ -93,14 +88,7 @@ export const ProductRow: React.FC<ProductRowProps> = ({
           <Pencil size={16} />
         </Link>
         <button
-          onClick={() =>
-            onDeleteRequest(
-              product.id,
-              product.title,
-              product.fileUrl,
-              product.thumbnailUrl,
-            )
-          }
+          onClick={() => onDeleteRequest(product.id, product.title)}
           className="w-8 h-8 rounded-lg bg-surface hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors cursor-pointer"
           title="Delete"
         >

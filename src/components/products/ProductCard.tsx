@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
@@ -8,12 +9,7 @@ import { ProductResponseDto } from "@/schemas/productSchema";
 
 interface ProductCardProps {
   product: ProductResponseDto;
-  onDeleteRequest: (
-    id: string,
-    title: string,
-    fileUrl: string,
-    thumbnailUrl: string,
-  ) => void;
+  onDeleteRequest: (id: string, title: string) => void;
 }
 
 const currencySymbols: Record<string, string> = {
@@ -48,10 +44,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         className={`relative h-40 bg-linear-to-br ${gradient} flex items-center justify-center`}
       >
         {product.thumbnailUrl ? (
-          <img
+          <Image
             src={product.thumbnailUrl}
             alt={product.title}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
           />
         ) : (
           <svg
@@ -85,7 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </p>
 
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {product.tags?.slice(0, 3).map((tag: any) => (
+          {product.tags?.slice(0, 3).map((tag) => (
             <span
               key={tag}
               className="px-2 py-0.5 rounded-md bg-surface text-xs text-muted-foreground"
@@ -130,14 +128,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </Link>
         <div className="w-px h-4 bg-card-border/50" />
         <button
-          onClick={() =>
-            onDeleteRequest(
-              product.id,
-              product.title,
-              product.fileUrl,
-              product.thumbnailUrl,
-            )
-          }
+          onClick={() => onDeleteRequest(product.id, product.title)}
           className="flex flex-1 justify-center items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-danger transition-colors cursor-pointer"
         >
           <Trash2 size={14} /> Delete

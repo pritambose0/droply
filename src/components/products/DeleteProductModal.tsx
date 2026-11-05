@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { AlertTriangle, Loader2, X } from "lucide-react";
 import Button from "@/components/Button";
 
@@ -21,13 +21,60 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
   productName,
   error,
 }) => {
-  // Handle escape key
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
+  // Move focus into the dialog on open and restore it on close
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen && !isDeleting) onClose();
+    if (!isOpen) return;
+
+    previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+    cancelButtonRef.current?.focus();
+
+    return () => {
+      previouslyFocusedRef.current?.focus();
     };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isOpen]);
+
+  // Handle escape key and trap Tab focus inside the dialog
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const focusableSelector =
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isDeleting) {
+        onClose();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      const container = dialogRef.current;
+      if (!container) return;
+
+      const focusable = Array.from(
+        container.querySelectorAll<HTMLElement>(focusableSelector),
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, isDeleting, onClose]);
 
   // Handle scroll lock
@@ -50,14 +97,24 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md glass border border-card-border/60 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-product-title"
+        aria-describedby="delete-product-description"
+        className="relative w-full max-w-md glass border border-card-border/60 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-card-border/50 bg-surface/30">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-danger/10 text-danger flex items-center justify-center">
               <AlertTriangle size={20} />
             </div>
-            <h2 className="text-xl font-bold text-foreground">
+            <h2
+              id="delete-product-title"
+              className="text-xl font-bold text-foreground"
+            >
               Delete Product
             </h2>
           </div>
@@ -72,7 +129,10 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
 
         {/* Content */}
         <div className="p-6">
-          <p className="text-muted-foreground leading-relaxed">
+          <p
+            id="delete-product-description"
+            className="text-muted-foreground leading-relaxed"
+          >
             Are you sure you want to delete{" "}
             <span className="font-bold text-foreground">
               &quot;{productName}&quot;{" "}
@@ -90,6 +150,7 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
           {/* Actions */}
           <div className="mt-8 flex items-center justify-end gap-3">
             <Button
+              ref={cancelButtonRef}
               type="button"
               variant="secondary"
               onClick={onClose}
