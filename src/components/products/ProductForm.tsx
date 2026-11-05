@@ -17,7 +17,7 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 
@@ -81,20 +81,15 @@ export default function ProductForm({
   const [showPreview, setShowPreview] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [removedThumbnail, setRemovedThumbnail] = useState(false);
-  const [removedFile, setRemovedFile] = useState(false);
+  const [isUploadingAll, setIsUploadingAll] = useState(false);
+  const [overallProgress, setOverallProgress] = useState(0);
 
-  const {
-    uploadFile,
-    isLoading: isUploading,
-    progress,
-    error: uploadError,
-  } = useCloudinaryUpload();
+  const { uploadFile, error: uploadError } = useCloudinaryUpload();
 
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const isSaving =
-    isUploading || createProduct.isPending || updateProduct.isPending;
+    isUploadingAll || createProduct.isPending || updateProduct.isPending;
 
   // Auto-dismiss success message
   useEffect(() => {
@@ -111,37 +106,26 @@ export default function ProductForm({
     handleSubmit,
     watch,
     reset,
-    setValue,
+    getValues,
     formState: { errors },
   } = useForm<ProductFormSchema>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      price: 0,
-      currency: "USD",
-      tags: "",
-      status: "published",
+      title: initialData?.title || "",
+      description: initialData?.description || "",
+      price: initialData?.price ?? undefined,
+      currency: initialData?.currency || "USD",
+      tags: Array.isArray(initialData?.tags)
+        ? initialData?.tags.join(", ")
+        : "",
+      status: initialData?.status || "draft",
     },
   });
 
-  // Load initial data if editing
-  useEffect(() => {
-    if (initialData && mode === "edit") {
-      reset({
-        title: initialData.title || "",
-        description: initialData.description || "",
-        price: initialData.price || 0,
-        currency: initialData.currency || "USD",
-        tags: Array.isArray(initialData.tags)
-          ? initialData.tags.join(", ")
-          : "",
-        status: initialData.status || "published",
-      });
-    }
-  }, [initialData, mode, reset]);
-
-  const onSubmit = async (data: ProductFormSchema) => {
+  const onSubmit = async (
+    data: ProductFormSchema,
+    intentStatus: "draft" | "published",
+  ) => {
     setSubmitError(null);
     setSubmitSuccess(false);
 
@@ -162,28 +146,54 @@ export default function ProductForm({
     let thumbnailPublicId = initialData?.thumbnailPublicId;
     let filePublicId = initialData?.filePublicId;
 
-    try {
-      if (thumbFile) {
-        const thumbResult = await uploadFile(thumbFile);
-        if (!thumbResult) {
-          throw new Error("Thumbnail upload failed. Please try again.");
-        }
-        thumbnailUrl = thumbResult.secureUrl;
-        thumbnailPublicId = thumbResult.publicId;
-      }
+    const totalBytes = (thumbFile?.size ?? 0) + (productFile?.size ?? 0);
+    let thumbLoaded = 0;
+    let fileLoaded = 0;
+    const reportOverallProgress = () => {
+      if (totalBytes <= 0) return;
+      const percent = Math.min(
+        100,
+        Math.round(((thumbLoaded + fileLoaded) / totalBytes) * 100),
+      );
+      setOverallProgress(percent);
+    };
 
-      if (productFile) {
-        const fileResult = await uploadFile(productFile);
-        if (!fileResult) {
-          throw new Error("Product file upload failed. Please try again.");
+    try {
+      if (thumbFile || productFile) {
+        setIsUploadingAll(true);
+        setOverallProgress(0);
+        try {
+          if (thumbFile) {
+            const thumbResult = await uploadFile(thumbFile, (percent) => {
+              thumbLoaded = (thumbFile.size * percent) / 100;
+              reportOverallProgress();
+            });
+            if (!thumbResult) {
+              throw new Error("Thumbnail upload failed. Please try again.");
+            }
+            thumbnailUrl = thumbResult.secureUrl;
+            thumbnailPublicId = thumbResult.publicId;
+          }
+
+          if (productFile) {
+            const fileResult = await uploadFile(productFile, (percent) => {
+              fileLoaded = (productFile.size * percent) / 100;
+              reportOverallProgress();
+            });
+            if (!fileResult) {
+              throw new Error("Product file upload failed. Please try again.");
+            }
+            fileUrl = fileResult.secureUrl;
+            filePublicId = fileResult.publicId;
+          }
+        } finally {
+          setIsUploadingAll(false);
         }
-        fileUrl = fileResult.secureUrl;
-        filePublicId = fileResult.publicId;
       }
 
       const commonData = {
         ...data,
-        status: data.status as "draft" | "published",
+        status: intentStatus,
         tags:
           typeof data.tags === "string"
             ? data.tags
@@ -247,17 +257,31 @@ export default function ProductForm({
     }
   };
 
+  const onInvalid = (formErrors: FieldErrors<ProductFormSchema>) => {
+    const firstError = Object.values(formErrors)[0] as
+      | { message?: string }
+      | undefined;
+    setSubmitError(
+      firstError?.message ?? "Please fix the highlighted fields.",
+    );
+  };
+
+  const submitWith = (status: "draft" | "published") => {
+    void handleSubmit((data) => onSubmit(data, status), onInvalid)();
+  };
+
   const formValues = watch();
-  const displayThumbnail =
-    thumbPreview || (!removedThumbnail ? initialData?.thumbnailUrl : undefined);
-  const displayProductFile =
-    productFileName || (!removedFile ? initialData?.fileUrl : undefined);
+  const displayThumbnail = thumbPreview || initialData?.thumbnailUrl;
+  const displayProductFile = productFileName || initialData?.fileUrl;
 
   return (
     <>
       <form
         className="max-w-4xl mx-auto space-y-6 pb-24 animate-fade-in-up"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(
+          (data) => onSubmit(data, getValues("status") ?? "draft"),
+          onInvalid,
+        )}
       >
         {/* ── Header / Sticky Action Bar ── */}
         <div className="sticky top-0 z-20 mt-2">
@@ -306,7 +330,7 @@ export default function ProductForm({
                       Create New Product
                     </h1>
                     <p className="text-xs text-muted-foreground">
-                      Draft mode automatically saved.
+                      Save as a draft and publish when ready.
                     </p>
                   </>
                 )}
@@ -322,57 +346,37 @@ export default function ProductForm({
               >
                 Preview
               </Button>
-              {formValues.status === "published" ? (
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setValue("status", "draft");
-                    handleSubmit(onSubmit)();
-                  }}
-                  className="px-4 py-2"
-                  type="button"
-                  disabled={isSaving}
-                >
-                  Unpublish
-                </Button>
-              ) : (
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setValue("status", "draft");
-                    handleSubmit(onSubmit)();
-                  }}
-                  className="px-4 py-2"
-                  type="button"
-                  disabled={isSaving}
-                >
-                  Save Draft
-                </Button>
-              )}
+              <Button
+                variant="secondary"
+                onClick={() => submitWith("draft")}
+                className="px-4 py-2"
+                type="button"
+                disabled={isSaving}
+              >
+                {formValues.status === "published" ? "Unpublish" : "Save Draft"}
+              </Button>
               <Button
                 variant="primary"
-                onClick={() => {
-                  if (mode === "create") setValue("status", "published");
-                }}
+                onClick={() => submitWith("published")}
                 className="px-4 py-2"
-                type="submit"
+                type="button"
                 isLoading={isSaving}
                 loadingText={
-                  isUploading ? `Saving… ${progress}%` : "Saving…"
+                  isUploadingAll ? `Uploading… ${overallProgress}%` : "Saving…"
                 }
               >
                 <Save size={16} />
-                {mode === "edit" ? "Save Changes" : "Publish"}
+                {formValues.status === "draft" ? "Publish" : "Save Changes"}
               </Button>
             </div>
           </div>
 
           {/* ── Progress & Alerts ── */}
-          {isUploading && (
+          {isUploadingAll && (
             <div className="mt-2 rounded-xl overflow-hidden bg-surface/50 backdrop-blur-sm border border-card-border/40 h-1.5">
               <div
                 className="h-full bg-linear-to-r from-accent to-purple-400 transition-all duration-300 ease-out rounded-full"
-                style={{ width: `${progress}%` }}
+                style={{ width: `${overallProgress}%` }}
               />
             </div>
           )}
@@ -491,20 +495,19 @@ export default function ProductForm({
                     height={720}
                     className="w-full aspect-video object-cover"
                   />
-                  <Button
-                    type="button"
-                    variant="none"
-                    onClick={() => {
-                      removeThumb();
-                      setRemovedThumbnail(true);
-                    }}
-                    className="absolute top-3 right-3 p-0 w-9 h-9 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/70 hover:text-white hover:bg-danger/20 hover:border-danger/30 transition-all flex items-center justify-center shadow-2xl group/remove"
-                  >
-                    <X
-                      size={18}
-                      className="group-hover/remove:rotate-90 transition-transform duration-300"
-                    />
-                  </Button>
+                  {thumbPreview && (
+                    <Button
+                      type="button"
+                      variant="none"
+                      onClick={removeThumb}
+                      className="absolute top-3 right-3 p-0 w-9 h-9 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-white/70 hover:text-white hover:bg-danger/20 hover:border-danger/30 transition-all flex items-center justify-center shadow-2xl group/remove"
+                    >
+                      <X
+                        size={18}
+                        className="group-hover/remove:rotate-90 transition-transform duration-300"
+                      />
+                    </Button>
+                  )}
                   <div className="absolute bottom-4 right-4">
                     <Button
                       type="button"
@@ -580,23 +583,22 @@ export default function ProductForm({
                       <FileText size={16} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-foreground truncate max-w-[200px]">
+                      <span className="text-sm font-medium text-foreground truncate max-w-50">
                         {productFileName || "Current Uploaded File"}
                       </span>
                       <span className="text-[10px] text-success">Ready</span>
                     </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="none"
-                    onClick={() => {
-                      removeProductFile();
-                      setRemovedFile(true);
-                    }}
-                    className="text-xs text-muted-foreground hover:text-danger transition-colors"
-                  >
-                    Remove
-                  </Button>
+                  {productFileName && (
+                    <Button
+                      type="button"
+                      variant="none"
+                      onClick={removeProductFile}
+                      className="text-xs text-muted-foreground hover:text-danger transition-colors"
+                    >
+                      Remove
+                    </Button>
+                  )}
                 </div>
               ) : null}
 

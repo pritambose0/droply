@@ -10,6 +10,7 @@ export function useCloudinaryUpload() {
   const uploadFile = useCallback(
     async (
       file: File,
+      onProgress?: (percent: number) => void,
     ): Promise<{
       secureUrl: string;
       publicId: string;
@@ -47,6 +48,7 @@ export function useCloudinaryUpload() {
                 (e.loaded * 100) / (e.total || 1),
               );
               setProgress(percentCompleted);
+              onProgress?.(percentCompleted);
             },
           },
         );
@@ -56,10 +58,14 @@ export function useCloudinaryUpload() {
           publicId: response.data.public_id,
           resourceType: response.data.resource_type,
         };
-      } catch (err: any) {
+      } catch (err) {
+        const e = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
         const msg =
-          err.response?.data?.message ||
-          err.message ||
+          e.response?.data?.message ||
+          e.message ||
           "Upload failed. Please try again.";
         setError(msg);
         return null;
@@ -83,10 +89,14 @@ export function useCloudinaryUpload() {
           throw new Error("Failed to delete file. Please try again.");
         }
         return true;
-      } catch (err: any) {
+      } catch (err) {
+        const e = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
         const msg =
-          err.response?.data?.message ||
-          err.message ||
+          e.response?.data?.message ||
+          e.message ||
           "Failed to delete file. Please try again.";
         setError(msg);
         return false;

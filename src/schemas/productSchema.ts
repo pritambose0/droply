@@ -13,7 +13,7 @@ export const createProductSchema = z.object({
     .max(1000, "Description must be at most 1000 characters long")
     .trim(),
   price: z
-    .number()
+    .number({ error: "Please enter a valid price" })
     .min(0, "Price must be at least 0")
     .max(1000000, "Price must be at most 1000000"),
   currency: z.enum(SUPPORTED_CURRENCIES),
@@ -24,7 +24,7 @@ export const createProductSchema = z.object({
     .string()
     .min(1, "Thumbnail Public ID is required")
     .trim(),
-  status: z.enum(["draft", "published"]).default("published"),
+  status: z.enum(["draft", "published"]).default("draft"),
   tags: z
     .union([z.string(), z.array(z.string())])
     .transform((val) => {
@@ -78,10 +78,6 @@ export const productResponseSchema = createProductSchema.extend({
   id: z.string().min(1, "Product ID is required").trim(),
   createdAt: z.string().transform((val) => new Date(val)),
   updatedAt: z.string().transform((val) => new Date(val)),
-  deletedAt: z
-    .string()
-    .transform((val) => new Date(val))
-    .optional(),
   userId: z.string().min(1, "User ID is required").trim(),
   salesCount: z.number().min(0, "Sales count must be at least 0"),
 });
