@@ -4,26 +4,18 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  Library, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Library,
+  Settings,
+  LogOut,
+  Menu,
   X,
-  Droplet
+  Compass,
 } from "lucide-react";
-
-function DroplyLogo() {
-  return (
-    <div className="relative flex items-center justify-center">
-      <Droplet size={28} className="text-accent fill-accent/20" />
-      <div className="absolute inset-0 blur-sm bg-accent/20 rounded-full scale-150" />
-    </div>
-  );
-}
+import { DroplyLogo } from "@/components/ui/Logo";
 
 const sellerNavGroups = [
   {
@@ -36,15 +28,11 @@ const sellerNavGroups = [
   },
   {
     title: "Buyer",
-    items: [
-      { href: "/buyer/library", label: "Purchases", Icon: Library },
-    ],
+    items: [{ href: "/buyer/library", label: "Purchases", Icon: Library }],
   },
   {
     title: "Account",
-    items: [
-      { href: "/seller/settings", label: "Settings", Icon: Settings },
-    ],
+    items: [{ href: "/seller/settings", label: "Settings", Icon: Settings }],
   },
 ];
 
@@ -58,9 +46,7 @@ const buyerNavGroups = [
   },
   {
     title: "Account",
-    items: [
-      { href: "/buyer/settings", label: "Settings", Icon: Settings },
-    ],
+    items: [{ href: "/buyer/settings", label: "Settings", Icon: Settings }],
   },
 ];
 
@@ -74,14 +60,15 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data: session, status } = useSession();
 
-  const role: "BUYER" | "CREATOR" = session?.user?.role === "creator" ? "CREATOR" : "BUYER";
+  const role: "BUYER" | "CREATOR" =
+    session?.user?.role === "creator" ? "CREATOR" : "BUYER";
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/sign-in");
     }
 
-    // Role-based protection: Redirect buyers away from seller routes
+    // Role-based protection: redirect buyers away from seller routes
     if (status === "authenticated" && role === "BUYER") {
       if (pathname.startsWith("/seller")) {
         router.push("/buyer/library");
@@ -89,73 +76,84 @@ export default function DashboardLayout({
     }
   }, [status, role, pathname, router]);
 
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
   const navGroups = role === "CREATOR" ? sellerNavGroups : buyerNavGroups;
 
   if (status === "loading" || status === "unauthenticated") {
     return (
-      <div className="min-h-screen bg-background noise grid-pattern flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-accent border-t-transparent animate-spin"></div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
       </div>
     );
   }
 
   const userInitial = session?.user?.name?.[0]?.toUpperCase() || "U";
-  const userName = session?.user?.name || "Droply User";
-  const userEmail = session?.user?.email || "user@droply.com";
+  const userName = session?.user?.name || "Droply user";
+  const userEmail = session?.user?.email || "";
+  const roleLabel = role === "CREATOR" ? "Creator account" : "Buyer account";
+
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <div className="min-h-screen bg-background noise grid-pattern flex">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden animate-fade-in"
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen w-64 glass border-r border-card-border z-50 flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-          }`}
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-card-border bg-[#0c0c0f] transition-transform duration-300 lg:sticky lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        {/* Logo */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-card-border">
-          <Link href="/" className="flex items-center gap-2.5 group" id="dashboard-logo">
+        <div className="flex items-center justify-between border-b border-card-border px-5 py-5">
+          <Link href="/" className="group flex items-center gap-2.5">
             <DroplyLogo />
-            <span className="text-lg font-bold tracking-tight text-foreground group-hover:text-accent transition-colors">
+            <span className="text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-accent">
               Droply
             </span>
           </Link>
           <button
-            className="lg:hidden text-muted-foreground hover:text-foreground transition-colors"
+            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground lg:hidden"
             onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
           {navGroups.map((group) => (
             <div key={group.title}>
-              <div className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {group.title}
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {group.items.map((item) => {
-                  const isActive = pathname === item.href;
+                  const active = isActive(item.href);
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
-                          ? "bg-accent/10 text-accent border border-accent/20"
-                          : "text-muted-foreground hover:text-foreground hover:bg-surface-hover border border-transparent"
-                        }`}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-accent/10 text-accent"
+                          : "text-muted-foreground hover:bg-surface hover:text-foreground"
+                      }`}
                     >
-                      <item.Icon size={20} className={isActive ? "text-accent" : "text-muted-foreground"} />
+                      <item.Icon
+                        size={18}
+                        className={active ? "text-accent" : "text-muted-foreground"}
+                      />
                       {item.label}
                     </Link>
                   );
@@ -163,54 +161,66 @@ export default function DashboardLayout({
               </div>
             </div>
           ))}
+
+          <div>
+            <div className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Marketplace
+            </div>
+            <Link
+              href="/discover"
+              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+            >
+              <Compass size={18} className="text-muted-foreground" />
+              Explore products
+            </Link>
+          </div>
         </nav>
 
-        {/* Bottom */}
-        <div className="px-3 pb-4 border-t border-card-border pt-4 mt-auto">
-
-          {/* User avatar placeholder */}
-          <div className="flex items-center gap-3 px-4 py-3 mb-2 hover:bg-surface-hover rounded-xl cursor-pointer transition-colors">
-            <div className="w-8 h-8 rounded-full bg-linear-to-br from-accent to-purple-400 flex items-center justify-center text-xs font-bold text-white uppercase shadow-sm">
+        <div className="border-t border-card-border p-3">
+          <div className="mb-2 flex items-center gap-3 rounded-lg px-3 py-2.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-bold uppercase text-accent">
               {userInitial}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{userName}</p>
-              <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-foreground">
+                {userName}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">
+                {userEmail}
+              </p>
             </div>
           </div>
+          <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            {roleLabel}
+          </p>
           <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            id="nav-logout"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-danger hover:bg-danger/5 transition-all w-full"
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-danger/5 hover:text-danger"
           >
-            <LogOut size={20} />
-            Sign Out
+            <LogOut size={18} />
+            Sign out
           </button>
         </div>
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Mobile header */}
-        <header className="lg:hidden sticky top-0 z-30 glass border-b border-card-border px-4 py-3 flex items-center justify-between">
+      <div className="flex min-h-screen flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-card-border bg-background/80 px-4 py-3 backdrop-blur-xl lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-foreground"
-            id="mobile-menu-toggle"
+            className="rounded-lg p-1.5 text-foreground hover:bg-surface"
+            aria-label="Open sidebar"
           >
-            <Menu size={24} />
+            <Menu size={22} />
           </button>
           <Link href="/" className="flex items-center gap-2">
             <DroplyLogo />
             <span className="font-bold text-foreground">Droply</span>
           </Link>
-          <div className="w-6" />
+          <div className="h-9 w-9" />
         </header>
 
-        {/* Content */}
-        <main className="flex-1 p-6 lg:p-8 animate-fade-in">
-          {children}
-        </main>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

@@ -10,13 +10,13 @@ interface ButtonLinkProps extends LinkProps {
 
 const variants = {
   primary:
-    "bg-linear-to-r from-accent to-purple-400 text-white shadow-lg shadow-accent/20 hover:opacity-90",
+    "bg-accent text-white shadow-sm hover:bg-accent-hover active:scale-[0.99]",
   secondary:
     "bg-surface hover:bg-surface-hover text-foreground border border-card-border",
-  ghost: "bg-transparent hover:bg-surface/10 text-muted-foreground hover:text-foreground",
+  ghost: "bg-transparent hover:bg-surface text-muted-foreground hover:text-foreground",
   outline:
     "bg-transparent border border-accent/30 text-accent hover:bg-accent/10",
-  danger: "bg-danger text-white shadow-lg shadow-danger/20 hover:opacity-90",
+  danger: "bg-danger text-white shadow-sm hover:bg-danger/90 active:scale-[0.99]",
   none: "",
 };
 
@@ -29,7 +29,7 @@ export default function ButtonLink({
   return (
     <Link
       className={twMerge(
-        "inline-flex items-center justify-center gap-2 rounded-xl font-medium text-sm transition-all cursor-pointer py-3 px-6",
+        "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-hover",
         variant !== "none" && variants[variant],
         className,
       )}

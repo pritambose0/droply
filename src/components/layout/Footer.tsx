@@ -1,13 +1,24 @@
+"use client";
+
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { DroplyLogo } from "../ui/Logo";
 
 const FOOTER_LINKS = [
   {
-    heading: "Product",
+    heading: "Marketplace",
     links: [
-      { href: "/discover", label: "Discover" },
+      { href: "/discover", label: "Explore Products" },
+      { href: "/discover?price=free", label: "Free Resources" },
       { href: "/pricing", label: "Pricing" },
-      { href: "/sign-up", label: "Get Started Free" },
+    ],
+  },
+  {
+    heading: "Company",
+    links: [
+      { href: "/about", label: "About" },
+      { href: "/features", label: "Features" },
+      { href: "/contact", label: "Contact" },
     ],
   },
   {
@@ -21,6 +32,20 @@ const FOOTER_LINKS = [
 ];
 
 export function Footer() {
+  const { data: session } = useSession();
+  const role = session?.user.role;
+  const sellHref =
+    role === "creator" ? "/seller/products/new" : "/sign-up?role=creator";
+
+  const footerLinks = FOOTER_LINKS.map((column) =>
+    column.heading === "Marketplace" && role !== "buyer"
+      ? {
+          ...column,
+          links: [...column.links, { href: sellHref, label: "Start Selling" }],
+        }
+      : column,
+  );
+
   return (
     <footer className="pt-16 pb-8 px-6 border-t border-card-border/40 relative z-10 w-full">
       <div className="max-w-5xl mx-auto">
@@ -32,14 +57,15 @@ export function Footer() {
               <DroplyLogo />
               <span className="font-bold text-foreground text-lg">Droply</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              The cleanest way for creators to sell digital products and get paid instantly.
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              A marketplace for discovering digital products and listing your
+              own. Built for buyers and independent creators.
             </p>
           </div>
 
           {/* Links */}
-          <div className="flex gap-12 md:gap-16">
-            {FOOTER_LINKS.map((col) => (
+          <div className="flex flex-wrap gap-10 md:gap-14">
+            {footerLinks.map((col) => (
               <div key={col.heading} className="space-y-4">
                 <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">
                   {col.heading}
@@ -47,7 +73,7 @@ export function Footer() {
                 <div className="flex flex-col gap-2.5">
                   {col.links.map((link) => (
                     <Link
-                      key={link.href}
+                      key={`${link.href}-${link.label}`}
                       href={link.href}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
@@ -63,10 +89,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-card-border/40 gap-4 text-xs text-muted-foreground">
           <span>© {new Date().getFullYear()} Droply. All rights reserved.</span>
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-success" />
-            <span>All systems operational</span>
-          </div>
+          <span>Built for independent creators and buyers.</span>
         </div>
       </div>
     </footer>

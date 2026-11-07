@@ -9,48 +9,43 @@ interface ProductSkeletonProps {
 export const ProductSkeleton: React.FC<ProductSkeletonProps> = ({ viewMode }) => {
   if (viewMode === "list") {
     return (
-      <div className="glass rounded-xl p-4 flex items-center gap-4 animate-pulse">
-        {/* Mini thumbnail skeleton */}
-        <div className="w-16 h-16 rounded-xl bg-white/5 shrink-0" />
-        
-        {/* Info skeleton */}
+      <div className="flex animate-pulse items-center gap-4 rounded-xl border border-card-border bg-card-bg p-4">
+        <div className="h-16 w-16 shrink-0 rounded-xl bg-surface" />
+
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-white/10 rounded-md w-1/3" />
-          <div className="h-3 bg-white/5 rounded-md w-1/2" />
-          <div className="flex gap-2 mt-2">
-            <div className="h-5 bg-white/5 rounded w-12" />
-            <div className="h-5 bg-white/5 rounded w-12" />
+          <div className="h-4 w-1/3 rounded-md bg-surface" />
+          <div className="h-3 w-1/2 rounded-md bg-surface" />
+          <div className="mt-2 flex gap-2">
+            <div className="h-5 w-12 rounded bg-surface" />
+            <div className="h-5 w-12 rounded bg-surface" />
           </div>
         </div>
-        
-        {/* Price skeleton */}
-        <div className="w-16 h-8 bg-white/10 rounded-lg shrink-0" />
+
+        <div className="h-8 w-16 shrink-0 rounded-lg bg-surface" />
       </div>
     );
   }
 
   return (
-    <div className="glass rounded-2xl overflow-hidden animate-pulse">
-      {/* Thumbnail area skeleton */}
-      <div className="h-40 bg-white/5" />
-      
-      {/* Content skeleton */}
-      <div className="p-5 space-y-4">
+    <div className="animate-pulse overflow-hidden rounded-2xl border border-card-border bg-card-bg">
+      <div className="h-40 border-b border-card-border bg-surface" />
+
+      <div className="space-y-4 p-5">
         <div>
-          <div className="h-5 bg-white/10 rounded-md w-3/4 mb-2" />
-          <div className="h-3 bg-white/5 rounded-md w-full" />
-          <div className="h-3 bg-white/5 rounded-md w-2/3 mt-1" />
+          <div className="mb-2 h-5 w-3/4 rounded-md bg-surface" />
+          <div className="h-3 w-full rounded-md bg-surface" />
+          <div className="mt-1 h-3 w-2/3 rounded-md bg-surface" />
         </div>
-        
+
         <div className="flex gap-2">
-          <div className="h-6 bg-white/5 rounded-md w-12" />
-          <div className="h-6 bg-white/5 rounded-md w-12" />
-          <div className="h-6 bg-white/5 rounded-md w-12" />
+          <div className="h-6 w-12 rounded-md bg-surface" />
+          <div className="h-6 w-12 rounded-md bg-surface" />
+          <div className="h-6 w-12 rounded-md bg-surface" />
         </div>
-        
-        <div className="flex justify-between items-center pt-2">
-          <div className="h-6 bg-white/10 rounded-md w-16" />
-          <div className="h-4 bg-white/5 rounded-md w-12" />
+
+        <div className="flex items-center justify-between pt-2">
+          <div className="h-6 w-16 rounded-md bg-surface" />
+          <div className="h-4 w-12 rounded-md bg-surface" />
         </div>
       </div>
     </div>

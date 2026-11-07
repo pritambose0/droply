@@ -7,15 +7,9 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background noise grid-pattern relative flex flex-col overflow-x-hidden">
-      {/* ── Ambient Glow Orbs (Subtle) ── */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-accent/10 blur-[120px] pointer-events-none" />
-      <div className="absolute top-[20%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
-      
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-background">
       <Navbar />
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );

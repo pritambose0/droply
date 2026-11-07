@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Filter, RefreshCw, Search, TrendingUp, X } from "lucide-react";
+import { Compass, Filter, RefreshCw, Search, X } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import { getApiErrorMessage } from "@/hooks/useProducts";
@@ -222,17 +222,16 @@ export default function DiscoverPage() {
   return (
     <div className="pt-32 pb-24 min-h-screen">
       {/* ── Hero ── */}
-      <div className="px-6 mb-12">
-        <div className="max-w-7xl mx-auto text-center animate-fade-in-up">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-semibold tracking-widest uppercase mb-6 border border-accent/20">
-            <TrendingUp size={14} /> The Marketplace
+      <div className="mb-10 px-6">
+        <div className="mx-auto max-w-7xl">
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+            <Compass size={14} /> The marketplace
           </span>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-foreground">
-            Discover <span className="gradient-text">Creator Tools</span>
+          <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            Explore digital products
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-            Explore thousands of premium digital products, templates, and
-            resources built by top creators around the world.
+          <p className="max-w-2xl text-base text-muted-foreground">
+            Browse templates, guides, and resources from independent creators.
           </p>
         </div>
       </div>
@@ -244,7 +243,7 @@ export default function DiscoverPage() {
           <Button
             variant="none"
             onClick={() => setIsMobileFiltersOpen(true)}
-            className="glass px-4 py-2.5 text-sm font-medium text-foreground hover:bg-surface-hover"
+            className="rounded-xl border border-card-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
           >
             <Filter size={18} />
             Filters
@@ -260,7 +259,7 @@ export default function DiscoverPage() {
             }}
             options={SORT_OPTIONS}
             containerClassName="w-40 sm:w-44"
-            className="glass px-4 py-2.5 text-sm font-medium"
+            className="border-card-border bg-surface px-4 py-2.5 text-sm font-medium"
           />
         </div>
 
@@ -291,7 +290,7 @@ export default function DiscoverPage() {
         {/* Product Grid Area */}
         <div className="flex-1 space-y-6">
           {/* Top Bar: Search & Sort */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between glass p-2 pl-4 rounded-2xl sticky top-24 z-20 shadow-sm">
+          <div className="sticky top-24 z-20 flex flex-col items-center justify-between gap-4 rounded-2xl border border-card-border bg-card-bg p-2 pl-4 shadow-sm sm:flex-row">
             <Input
               id="marketplace-search"
               type="text"
@@ -349,17 +348,17 @@ export default function DiscoverPage() {
 
           {/* Grid */}
           {isError && !data ? (
-            <div className="glass rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in-up border border-danger/20">
-              <div className="w-16 h-16 rounded-2xl bg-danger/10 text-danger flex items-center justify-center mb-4">
-                <RefreshCw size={24} />
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-danger/20 bg-danger/5 p-16 text-center">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-danger/10 text-danger">
+                <RefreshCw size={22} />
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
+              <h3 className="mb-2 text-lg font-semibold text-foreground">
                 Couldn&apos;t load the marketplace
               </h3>
-              <p className="text-muted-foreground max-w-md mx-auto mb-6">
+              <p className="mx-auto mb-6 max-w-md text-sm text-muted-foreground">
                 {getApiErrorMessage(error, "Please try again in a moment.")}
               </p>
-              <Button onClick={() => refetch()}>
+              <Button onClick={() => refetch()} variant="secondary">
                 <RefreshCw size={16} />
                 Try again
               </Button>
@@ -381,16 +380,16 @@ export default function DiscoverPage() {
               ))}
             </div>
           ) : (
-            <div className="glass rounded-3xl p-16 text-center flex flex-col items-center justify-center animate-fade-in-up">
-              <div className="w-20 h-20 rounded-full bg-surface border border-card-border flex items-center justify-center mb-6">
-                <Search className="text-muted-foreground" size={32} />
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-card-border bg-surface/30 p-16 text-center">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-surface text-muted-foreground">
+                <Search size={24} />
               </div>
-              <h3 className="text-2xl font-bold text-foreground mb-2">
+              <h3 className="mb-2 text-lg font-semibold text-foreground">
                 No products found
               </h3>
-              <p className="text-muted-foreground max-w-md mx-auto mb-8">
+              <p className="mx-auto mb-6 max-w-md text-sm text-muted-foreground">
                 {hasActiveFilters
-                  ? `We couldn't find anything matching your current filters. Try a different search or category.`
+                  ? "We couldn't find anything matching your current filters. Try a different search or category."
                   : "No products have been published yet. Check back soon."}
               </p>
               {hasActiveFilters && (

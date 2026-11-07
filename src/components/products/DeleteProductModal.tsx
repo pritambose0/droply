@@ -103,19 +103,19 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
         aria-modal="true"
         aria-labelledby="delete-product-title"
         aria-describedby="delete-product-description"
-        className="relative w-full max-w-md glass border border-card-border/60 rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up"
+        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-card-border bg-[#111114] shadow-2xl animate-fade-in-up"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-card-border/50 bg-surface/30">
+        <div className="flex items-center justify-between border-b border-card-border p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-danger/10 text-danger flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-danger/10 text-danger">
               <AlertTriangle size={20} />
             </div>
             <h2
               id="delete-product-title"
-              className="text-xl font-bold text-foreground"
+              className="text-lg font-semibold text-foreground"
             >
-              Delete Product
+              Delete product
             </h2>
           </div>
           <button
@@ -134,11 +134,11 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
             className="text-muted-foreground leading-relaxed"
           >
             Are you sure you want to delete{" "}
-            <span className="font-bold text-foreground">
-              &quot;{productName}&quot;{" "}
+            <span className="font-semibold text-foreground">
+              &quot;{productName}&quot;
             </span>
             ? This action cannot be undone and will permanently remove the
-            product from your store.
+            product from your catalogue.
           </p>
 
           {error && (
@@ -155,16 +155,16 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
               variant="secondary"
               onClick={onClose}
               disabled={isDeleting}
-              className="px-6 py-2.5 bg-surface hover:bg-surface-hover"
+              className="px-5 py-2.5"
             >
               Cancel
             </Button>
             <Button
               type="button"
-              variant="none"
+              variant="danger"
               onClick={onConfirm}
               disabled={isDeleting}
-              className="px-6 py-2.5 bg-danger text-white hover:bg-danger/90 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+              className="px-5 py-2.5"
             >
               {isDeleting ? (
                 <>
@@ -172,7 +172,7 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
                   Deleting...
                 </>
               ) : (
-                "Yes, Delete"
+                "Delete product"
               )}
             </Button>
           </div>

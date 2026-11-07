@@ -1,45 +1,46 @@
-"use client";
-
 import Link from "next/link";
-import { Clock, ArrowRight, Mail } from "lucide-react";
+import { ArrowRight, Clock, Info } from "lucide-react";
 
 export default function CheckoutPendingPage() {
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 flex flex-col items-center justify-center text-center">
-      <div className="max-w-xl w-full mx-auto space-y-8 animate-fade-in-up">
-        
-        {/* ── Status Hero ── */}
+    <div className="flex min-h-screen flex-col items-center justify-center px-6 pb-24 pt-32 text-center">
+      <div className="w-full max-w-xl space-y-8">
         <div className="space-y-4">
-          <div className="w-24 h-24 rounded-full bg-warning/10 flex items-center justify-center mx-auto mb-6 relative">
-            <div className="absolute inset-0 border-4 border-warning/30 rounded-full border-t-warning animate-spin" />
-            <div className="w-16 h-16 rounded-full bg-warning flex items-center justify-center shadow-lg shadow-warning/30 z-10">
-              <Clock size={32} className="text-white" />
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-warning/10">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-warning">
+              <Clock size={28} className="text-white" />
             </div>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground">Payment Pending</h1>
-          <p className="text-lg text-muted-foreground">
-            We are waiting for your payment provider to confirm the transaction. This usually takes a few moments.
+          <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            Payment pending
+          </h1>
+          <p className="text-base text-muted-foreground">
+            This is the pending payment state for a checkout flow.
           </p>
         </div>
 
-        {/* ── Info Card ── */}
-        <div className="glass rounded-2xl p-6 border border-card-border flex flex-col items-center gap-4 text-center">
-           <Mail className="text-muted-foreground" size={32} />
-           <div>
-             <p className="text-sm font-bold text-foreground">We&apos;ll email your receipt</p>
-             <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto leading-relaxed">
-               You can safely leave this page. Once the payment clears, we will automatically send you an email receipt and add the product to your library.
-             </p>
-           </div>
+        <div className="surface-card flex flex-col items-center gap-4 p-6 text-center">
+          <Info className="text-accent" size={24} />
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Payment confirmation is not connected
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+              Once payment processing is implemented, this page will reflect the
+              provider&apos;s status and link the order to your library. Until
+              then, no real payment can be pending.
+            </p>
+          </div>
         </div>
 
-        {/* ── Actions ── */}
-        <div className="pt-6 border-t border-card-border/50">
-          <Link href="/buyer/orders" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-accent text-white font-bold text-sm hover:bg-accent/90 transition-all shadow-xl shadow-accent/20">
-            View My Orders <ArrowRight size={18} />
+        <div className="border-t border-card-border pt-6">
+          <Link
+            href="/discover"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-accent-hover"
+          >
+            Back to marketplace <ArrowRight size={16} />
           </Link>
         </div>
-
       </div>
     </div>
   );

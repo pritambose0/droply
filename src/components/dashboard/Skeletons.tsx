@@ -6,7 +6,7 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function StatCardSkeleton() {
   return (
-    <div className="glass rounded-2xl p-6 space-y-4">
+    <div className="surface-card p-6 space-y-4">
       <div className="flex justify-between items-center">
         <Skeleton className="h-5 w-24 rounded-lg" />
         <Skeleton className="h-10 w-10 rounded-xl" />
@@ -38,12 +38,12 @@ export function DashboardOverviewSkeleton() {
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Chart */}
-        <div className="lg:col-span-2 glass rounded-2xl p-6 space-y-6">
+        <div className="lg:col-span-2 surface-card p-6 space-y-6">
           <Skeleton className="h-6 w-32 rounded-xl" />
           <Skeleton className="h-[300px] w-full rounded-xl" />
         </div>
         {/* Recent Activity */}
-        <div className="glass rounded-2xl p-6 space-y-6">
+        <div className="surface-card p-6 space-y-6">
           <Skeleton className="h-6 w-32 rounded-xl" />
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map(i => (
@@ -64,7 +64,7 @@ export function DashboardOverviewSkeleton() {
 
 export function TableSkeleton() {
   return (
-    <div className="glass rounded-2xl overflow-hidden">
+    <div className="surface-card overflow-hidden">
       <div className="p-4 border-b border-card-border flex items-center justify-between">
         <Skeleton className="h-10 w-64 rounded-xl max-w-full" />
         <Skeleton className="h-10 w-32 rounded-xl shrink-0 hidden sm:block" />
@@ -150,7 +150,7 @@ export function SettingsSkeleton() {
         </div>
 
         {/* Form Fields */}
-        <div className="glass rounded-2xl p-6 space-y-8">
+        <div className="surface-card p-6 space-y-8">
           <div className="space-y-4">
             <Skeleton className="h-6 w-32 rounded-lg" />
             <Skeleton className="h-px w-full" />
@@ -204,7 +204,7 @@ export function LibrarySkeleton() {
       {/* Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3, 4, 5, 6].map(i => (
-          <div key={i} className="glass rounded-2xl p-5 space-y-4">
+          <div key={i} className="surface-card p-5 space-y-4">
             <Skeleton className="w-full h-40 rounded-xl" />
             <Skeleton className="h-5 w-3/4 rounded-lg" />
             <Skeleton className="h-4 w-1/2 rounded-lg" />

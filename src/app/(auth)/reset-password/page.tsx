@@ -117,7 +117,7 @@ function ResetPasswordContent() {
         <Link
           href="/sign-in"
           id="reset-go-to-signin"
-          className="block w-full py-3 rounded-xl bg-linear-to-r from-accent to-purple-400 text-white font-medium text-sm hover:opacity-90 transition-all shadow-lg shadow-accent/20"
+          className="block w-full rounded-xl bg-accent py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-accent-hover"
         >
           Sign In
         </Link>
@@ -253,7 +253,7 @@ function ResetPasswordContent() {
           disabled={isLoading}
           loadingText="Resetting"
           isLoading={isLoading}
-          className="w-full py-3 rounded-xl bg-linear-to-r from-accent to-purple-400 text-white font-medium text-sm hover:opacity-90 transition-all shadow-lg shadow-accent/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           Reset Password
         </Button>

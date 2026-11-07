@@ -1,105 +1,110 @@
-"use client";
-
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Info } from "lucide-react";
+
+const BUYER_FEATURES = [
+  "Create a free buyer account",
+  "Browse and search published products",
+  "Filter by category and price",
+  "View detailed product pages",
+  "Download access for paid orders",
+];
+
+const CREATOR_FEATURES = [
+  "Create a free creator account",
+  "Create and edit product listings",
+  "Save drafts or publish when ready",
+  "Upload thumbnails and delivery files",
+  "Tag products for discovery",
+  "Manage your catalog from a dashboard",
+];
 
 export default function PricingPage() {
   return (
-    <div className="pt-40 pb-24 px-6 min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16 animate-fade-in-up">
-          <span className="text-xs font-semibold uppercase tracking-widest text-accent mb-3 block">
+    <div className="min-h-screen px-6 pb-24 pt-32">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-12 max-w-2xl">
+          <span className="mb-3 block text-xs font-semibold uppercase tracking-widest text-accent">
             Pricing
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Simple, transparent <span className="gradient-text">pricing</span>
+          <h1 className="mb-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+            Free to join
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Droply is completely free to join. Choose the role that fits you.
+          <p className="text-lg leading-relaxed text-muted-foreground">
+            Creating a Droply account is free for buyers and creators. No
+            transaction fees are charged today because checkout is not connected
+            yet.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Buyer */}
-          <div className="glass rounded-2xl p-8 hover:border-accent/20 transition-all duration-500 group animate-fade-in-up delay-100">
-            <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="surface-card flex flex-col p-8">
+            <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Buyer
             </div>
-            <div className="text-5xl font-bold mb-1 text-foreground">Free</div>
-            <div className="text-sm text-muted-foreground mb-6">
-              Browse & purchase products securely
-            </div>
-            <div className="space-y-4 mb-10">
-              {[
-                "Discover published products",
-                "Search & filter by tags",
-                "One-click purchasing",
-                "Secure file downloads",
-                "Full order history",
-              ].map((f) => (
-                <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <span className="text-success flex-shrink-0"><Check size={16} /></span>
-                  {f}
-                </div>
+            <div className="mb-1 text-4xl font-bold text-foreground">Free</div>
+            <p className="mb-6 text-sm text-muted-foreground">
+              Explore the marketplace and manage purchases.
+            </p>
+            <ul className="mb-8 space-y-3">
+              {BUYER_FEATURES.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex items-start gap-2.5 text-sm text-muted-foreground"
+                >
+                  <Check size={15} className="mt-0.5 shrink-0 text-success" />
+                  {feature}
+                </li>
               ))}
-            </div>
+            </ul>
             <Link
-              href="/sign-up"
               id="buyer-sign-up"
-              className="block w-full text-center py-3.5 rounded-xl glass text-foreground font-medium hover:bg-surface-hover transition-all"
+              href="/sign-up"
+              className="mt-auto block w-full rounded-xl border border-card-border bg-surface py-3 text-center text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
             >
-              Start Buying
+              Start buying
             </Link>
           </div>
 
-          {/* Creator */}
-          <div className="relative glass rounded-2xl p-8 border-accent/20 hover:border-accent/40 transition-all duration-500 group animate-pulse-glow animate-fade-in-up delay-200">
-            <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-accent to-purple-400 text-xs font-semibold text-white">
-              Popular
+          <div className="surface-card flex flex-col border-accent/25 p-8">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-widest text-accent">
+                Creator
+              </span>
+              <span className="rounded-full bg-accent/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent">
+                Open
+              </span>
             </div>
-            <div className="text-xs font-semibold uppercase tracking-widest text-accent mb-4">
-              Creator
-            </div>
-            <div className="text-5xl font-bold mb-1 text-foreground">
-              0%
-              <span className="text-lg text-muted-foreground font-normal ml-2">transaction fee</span>
-            </div>
-            <div className="text-sm text-muted-foreground mb-6">
-              Full access to selling tools for free
-            </div>
-            <div className="space-y-4 mb-10">
-              {[
-                "Everything in Buyer",
-                "Create & publish unlimited products",
-                "Draft & Published workflow",
-                "Multi-currency pricing (USD, EUR, GBP, INR)",
-                "Full analytics and sales tracking",
-                "Custom tags for discovery",
-              ].map((f) => (
-                <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <span className="text-accent flex-shrink-0"><Check size={16} /></span>
-                  {f}
-                </div>
+            <div className="mb-1 text-4xl font-bold text-foreground">Free</div>
+            <p className="mb-6 text-sm text-muted-foreground">
+              List your digital products and manage your catalog.
+            </p>
+            <ul className="mb-8 space-y-3">
+              {CREATOR_FEATURES.map((feature) => (
+                <li
+                  key={feature}
+                  className="flex items-start gap-2.5 text-sm text-muted-foreground"
+                >
+                  <Check size={15} className="mt-0.5 shrink-0 text-accent" />
+                  {feature}
+                </li>
               ))}
-            </div>
+            </ul>
             <Link
-              href="/sign-up"
               id="creator-sign-up"
-              className="block w-full text-center py-3.5 rounded-xl bg-gradient-to-r from-accent to-purple-400 text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-accent/20"
+              href="/sign-up?role=creator"
+              className="mt-auto block w-full rounded-xl bg-accent py-3 text-center text-sm font-medium text-white transition-colors hover:bg-accent-hover"
             >
-              Start Selling
+              Start selling
             </Link>
           </div>
         </div>
 
-        <div className="mt-20 glass rounded-3xl p-10 md:p-12 text-center animate-fade-in-up delay-300">
-          <h3 className="text-2xl font-bold mb-4 text-foreground">Have a large audience?</h3>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            If you are processing more than $100k/month in digital product volume, we offer dedicated high-volume enterprise support.
+        <div className="mt-8 flex items-start gap-3 rounded-xl border border-card-border bg-surface/50 p-5">
+          <Info size={18} className="mt-0.5 shrink-0 text-accent" />
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Transaction fees and payout terms are not published yet. They will
+            be listed here once checkout and payments are implemented.
           </p>
-          <a href="mailto:support@droply.com" className="font-semibold text-accent hover:text-purple-400 transition-colors uppercase tracking-widest text-sm">
-            Contact Sales
-          </a>
         </div>
       </div>
     </div>

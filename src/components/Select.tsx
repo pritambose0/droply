@@ -33,7 +33,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <label
             htmlFor={id}
             className={twMerge(
-              "text-xs font-medium text-muted-foreground uppercase tracking-wider",
+              "text-sm font-medium text-foreground",
               labelClassName,
             )}
           >
@@ -46,7 +46,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={id}
             className={twMerge(
-              "w-full appearance-none rounded-xl border border-card-border bg-surface px-4 py-2.5 pr-10 text-sm font-medium text-foreground transition-all focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
+              "w-full cursor-pointer appearance-none rounded-xl border border-input-border bg-surface px-4 py-2.5 pr-10 text-sm font-medium text-foreground transition-all hover:border-input-border focus:border-accent/50 focus:outline-none focus:ring-2 focus:ring-input-focus disabled:cursor-not-allowed disabled:opacity-50",
               className,
             )}
             {...props}

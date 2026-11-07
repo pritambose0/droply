@@ -47,7 +47,7 @@ export default function ProductDetailLoading() {
           </div>
 
           {/* Sidebar skeleton */}
-          <div className="glass rounded-2xl p-6 space-y-5 hidden lg:block">
+          <div className="surface-card p-6 space-y-5 hidden lg:block">
             <Skeleton className="h-10 w-28 rounded-xl" />
             <Skeleton className="h-4 w-40 rounded-lg" />
             <div className="space-y-3">
@@ -69,7 +69,7 @@ export default function ProductDetailLoading() {
         <div className="grid lg:grid-cols-[1fr_340px] gap-8 items-start">
           <div className="space-y-6">
             <Skeleton className="h-10 w-72 rounded-xl" />
-            <div className="glass rounded-2xl p-8 space-y-4">
+            <div className="surface-card p-8 space-y-4">
               <Skeleton className="h-7 w-48 rounded-xl" />
               <Skeleton className="h-4 w-full rounded-lg" />
               <Skeleton className="h-4 w-5/6 rounded-lg" />
@@ -80,7 +80,7 @@ export default function ProductDetailLoading() {
           </div>
 
           {/* Creator card skeleton */}
-          <div className="glass rounded-2xl p-6 space-y-5">
+          <div className="surface-card p-6 space-y-5">
             <Skeleton className="h-3 w-16 rounded-md" />
             <div className="flex items-center gap-4">
               <Skeleton className="w-14 h-14 rounded-2xl shrink-0" />
@@ -107,7 +107,7 @@ export default function ProductDetailLoading() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="glass rounded-2xl p-5 space-y-4">
+              <div key={i} className="surface-card p-5 space-y-4">
                 <div className="flex items-start gap-4">
                   <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
                   <div className="flex-1 space-y-2">

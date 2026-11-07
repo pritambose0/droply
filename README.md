@@ -2,9 +2,11 @@
 
 # Droply
 
-**A production-ready digital product marketplace built with Next.js**
+**A digital product marketplace built with Next.js**
 
-Creators list and sell digital products. Buyers discover, purchase, and download them — all backed by robust authentication, role-based access, and a clean service-oriented architecture.
+Creators list digital products and buyers discover them through a fully wired marketplace — backed by robust authentication, role-based access, and a clean service-oriented architecture.
+
+> **Project status:** Catalog browsing, seller product management, authentication, and the order/download APIs are implemented. Checkout is **not connected to a payment provider yet**, and the buyer/seller dashboard pages are still placeholders. See [Project Status](#project-status).
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -14,6 +16,17 @@ Creators list and sell digital products. Buyers discover, purchase, and download
 </div>
 
 ---
+
+## Project Status
+
+| Area                          | Status                                                        |
+| ----------------------------- | ------------------------------------------------------------- |
+| Authentication & OTP          | Working                                                       |
+| Seller product management     | Working                                                       |
+| Marketplace discovery         | Working — search, filters, sorting, pagination, product pages |
+| Orders & downloads (API)      | Working, including paid-only download authorization           |
+| Checkout / payments           | Not connected — the Buy Now action is intentionally a no-op   |
+| Buyer & seller dashboards     | Placeholder pages (no live data wired yet)                    |
 
 ## Features
 
@@ -41,8 +54,10 @@ Creators list and sell digital products. Buyers discover, purchase, and download
 - Self-purchase prevention — creators cannot buy their own products
 - Payment status tracking — `pending` → `paid` / `failed`
 - Order status lifecycle — `processing` → `completed` / `cancelled` / `failed`
-- Paginated order history for both buyers and sellers
+- Paginated order history endpoints for both buyers and sellers
 - Secure product downloads — only after successful payment
+
+> **Note:** The order APIs and download authorization are implemented, but there is no checkout UI or payment provider integration yet. The buyer/seller dashboard pages are not wired to these endpoints.
 
 ---
 
@@ -195,7 +210,7 @@ cd droply
 pnpm install
 
 # Set up environment variables (see section below)
-cp .env.example .env
+# Create a .env file in the project root with the required values
 
 # Start the development server
 pnpm dev
@@ -216,6 +231,10 @@ Create a `.env` file in the project root with the following variables:
 | `NEXTAUTH_SECRET`     | Random secret for JWT signing                  | ✅        |
 | `RESEND_API_KEY`      | Resend API key for transactional emails        | ✅        |
 | `RESEND_FROM_EMAIL`   | Verified sender email address in Resend        | ✅        |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name for product assets     | ✅        |
+| `CLOUDINARY_API_KEY`  | Cloudinary API key                             | ✅        |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret                        | ✅        |
+| `NEXT_PUBLIC_APP_URL` | Public base URL of the app                     | ✅        |
 
 > **Tip:** Generate a secure `NEXTAUTH_SECRET` with: `openssl rand -base64 32`
 
@@ -236,14 +255,22 @@ Create a `.env` file in the project root with the following variables:
 
 ### Products
 
-| Method | Endpoint                              | Description                        | Auth Required |
-| ------ | ------------------------------------- | ---------------------------------- | ------------- |
-| GET    | `/api/products`                       | List published products (paginated)| No            |
-| POST   | `/api/products`                       | Create a new product               | Yes (Creator) |
-| GET    | `/api/products/:productId`            | Get product by ID                  | No            |
-| PUT    | `/api/products/:productId`            | Update a product                   | Yes (Creator) |
-| DELETE | `/api/products/:productId`            | Delete a product                   | Yes (Creator) |
-| GET    | `/api/products/:productId/download`   | Download the product file          | Yes (Buyer)   |
+| Method | Endpoint                              | Description                          | Auth Required |
+| ------ | ------------------------------------- | ------------------------------------ | ------------- |
+| GET    | `/api/products`                       | List the signed-in creator's products | Yes (Creator) |
+| POST   | `/api/products`                       | Create a new product                 | Yes (Creator) |
+| GET    | `/api/products/:productId`            | Get product by ID                    | No            |
+| PATCH  | `/api/products/:productId`            | Update a product                     | Yes (Creator) |
+| DELETE | `/api/products/:productId`            | Delete a product                     | Yes (Creator) |
+| GET    | `/api/products/:productId/download`   | Download the product file            | Yes (Buyer)   |
+
+### Marketplace
+
+| Method | Endpoint                        | Description                                | Auth Required |
+| ------ | ------------------------------- | ------------------------------------------ | ------------- |
+| GET    | `/api/marketplace`              | List published products with filters       | No            |
+| GET    | `/api/marketplace/categories`   | List published product tags with counts    | No            |
+| GET    | `/api/marketplace/:productId`   | Get a published product and related items  | No            |
 
 ### Orders
 
@@ -252,7 +279,6 @@ Create a `.env` file in the project root with the following variables:
 | GET    | `/api/orders`           | List orders (buyer or seller)     | Yes           |
 | POST   | `/api/orders`           | Place an order                    | Yes (Buyer)   |
 | GET    | `/api/orders/:orderId`  | Get order details                 | Yes           |
-| PATCH  | `/api/orders/:orderId`  | Update payment status             | Yes           |
 
 ---
 

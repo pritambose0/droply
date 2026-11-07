@@ -2,211 +2,151 @@
 
 import Link from "next/link";
 import {
-  Plus,
-  DollarSign,
-  ShoppingCart,
-  Package,
   ArrowUpRight,
-  CheckCircle2,
-  Clock,
-  XCircle,
+  DollarSign,
+  Info,
+  Package,
+  Plus,
+  ShoppingCart,
 } from "lucide-react";
+import { useProducts } from "@/hooks/useProducts";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { EmptyState } from "@/components/ui/EmptyState";
+import ButtonLink from "@/components/ButtonLink";
 
-/* ─── Data ─── */
-
-interface RecentOrder {
-  id: string;
-  product: string;
-  buyer: string;
-  status: string;
-  amount: number;
-}
-
-const RECENT_ORDERS: RecentOrder[] = [];
-
-const KPIS = [
-  {
-    label: "Total Revenue",
-    value: "$0",
-    change: "+0%",
-    up: true,
-    icon: DollarSign,
-    accent: "text-accent",
-    bg: "bg-accent/10",
-  },
-  {
-    label: "Total Orders",
-    value: "0",
-    change: "+0%",
-    up: true,
-    icon: ShoppingCart,
-    accent: "text-success",
-    bg: "bg-success/10",
-  },
-  {
-    label: "Active Products",
-    value: "0",
-    change: "0 drafts",
-    up: null,
-    icon: Package,
-    accent: "text-purple-400",
-    bg: "bg-purple-500/10",
-  },
-];
-
-/* ─── Status Badge ─── */
-function OrderStatus({ status }: { status: string }) {
-  if (status === "paid")
-    return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20">
-        <CheckCircle2 size={10} /> Paid
-      </span>
-    );
-  if (status === "pending")
-    return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-warning/10 text-warning border border-warning/20">
-        <Clock size={10} /> Pending
-      </span>
-    );
-  return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-danger/10 text-danger border border-danger/20">
-      <XCircle size={10} /> Failed
-    </span>
-  );
-}
-
-/* ─── Page ─── */
 export default function DashboardPage() {
-  return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-fade-in-up">
+  const publishedQuery = useProducts({
+    page: 1,
+    limit: 1,
+    status: "published",
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+  const draftQuery = useProducts({
+    page: 1,
+    limit: 1,
+    status: "draft",
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
 
-      {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
-            Dashboard
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Your store at a glance.
-          </p>
-        </div>
-        <Link
-          href="/seller/products/new"
-          id="dashboard-new-product"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-accent-hover transition-all shadow-lg shadow-accent/20 self-start sm:self-auto"
-        >
-          <Plus size={16} />
-          New Product
-        </Link>
+  const publishedCount = publishedQuery.data?.totalProducts ?? 0;
+  const draftCount = draftQuery.data?.totalProducts ?? 0;
+  const countsLoading = publishedQuery.isLoading || draftQuery.isLoading;
+
+  const kpis = [
+    {
+      label: "Published products",
+      value: countsLoading ? "—" : String(publishedCount),
+      detail: countsLoading ? "Loading…" : `${draftCount} draft${draftCount === 1 ? "" : "s"}`,
+      icon: Package,
+    },
+    {
+      label: "Total orders",
+      value: "—",
+      detail: "Not connected yet",
+      icon: ShoppingCart,
+    },
+    {
+      label: "Total revenue",
+      value: "—",
+      detail: "Not connected yet",
+      icon: DollarSign,
+    },
+  ];
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-8 pb-20">
+      <PageHeader
+        eyebrow="Creator"
+        title="Overview"
+        description="A snapshot of your catalog and sales."
+        actions={
+          <ButtonLink href="/seller/products/new" className="px-5 py-2.5">
+            <Plus size={16} />
+            New product
+          </ButtonLink>
+        }
+      />
+
+      <div className="flex items-start gap-3 rounded-xl border border-accent/20 bg-accent/5 p-4">
+        <Info size={18} className="mt-0.5 shrink-0 text-accent" />
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Product counts are live. Revenue and order metrics will populate once
+          the dashboard is connected to the orders API.
+        </p>
       </div>
 
-      {/* ── KPI Cards ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {KPIS.map((kpi) => (
-          <div
-            key={kpi.label}
-            className="glass rounded-2xl p-5 border border-card-border/60 flex flex-col gap-4 hover:border-card-border transition-colors"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {kpis.map((kpi) => (
+          <div key={kpi.label} className="surface-card p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {kpi.label}
               </span>
-              <div className={`w-8 h-8 rounded-lg ${kpi.bg} flex items-center justify-center ${kpi.accent} shrink-0`}>
-                <kpi.icon size={16} strokeWidth={2} />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                <kpi.icon size={16} />
               </div>
             </div>
-            <div>
-              <p className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
-                {kpi.value}
-              </p>
-              <p
-                className={`text-xs font-medium mt-1 ${kpi.up === true
-                  ? "text-success"
-                  : kpi.up === false
-                    ? "text-danger"
-                    : "text-muted-foreground"
-                  }`}
-              >
-                {kpi.change}
-              </p>
-            </div>
+            <p className="text-2xl font-bold tracking-tight text-foreground">
+              {kpi.value}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{kpi.detail}</p>
           </div>
         ))}
       </div>
 
-      {/* ── Bottom Row: Recent Orders + Quick Actions ── */}
-      <div className="grid lg:grid-cols-[1fr_260px] gap-6">
-
-        {/* Recent Orders */}
-        <div className="glass rounded-2xl border border-card-border/60 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-card-border/60">
-            <h2 className="text-base font-bold text-foreground">Recent Orders</h2>
+      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+        <div className="surface-card overflow-hidden">
+          <div className="flex items-center justify-between border-b border-card-border px-5 py-4">
+            <h2 className="text-sm font-semibold text-foreground">
+              Recent orders
+            </h2>
             <Link
               href="/seller/orders"
-              className="text-xs font-semibold text-accent hover:text-accent-hover transition-colors flex items-center gap-1"
+              className="flex items-center gap-1 text-xs font-medium text-accent transition-colors hover:text-accent-hover"
             >
               View all <ArrowUpRight size={12} />
             </Link>
           </div>
-          <div className="divide-y divide-card-border/40">
-            {RECENT_ORDERS.length > 0 ? RECENT_ORDERS.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between px-6 py-3.5 hover:bg-surface/40 transition-colors"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {order.product}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {order.buyer}{" "}
-                    <span className="font-mono text-muted-foreground/60">· {order.id}</span>
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 shrink-0 ml-4">
-                  <OrderStatus status={order.status} />
-                  <span className="text-sm font-bold text-foreground w-10 text-right">
-                    ${order.amount}
-                  </span>
-                </div>
-              </div>
-            )) : (
-              <div className="px-6 py-8 text-center text-muted-foreground text-sm">
-                No recent orders to show.
-              </div>
-            )}
+          <div className="p-4">
+            <EmptyState
+              compact
+              icon={ShoppingCart}
+              title="No orders to show"
+              description="Orders will appear here once the dashboard is connected to the orders API."
+            />
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="glass rounded-2xl p-6 border border-card-border/60 flex flex-col gap-3">
-          <h2 className="text-base font-bold text-foreground mb-1">Quick Actions</h2>
-          <Link
-            href="/seller/products/new"
-            id="qa-add-product"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent/10 hover:bg-accent/20 text-accent font-semibold text-sm transition-colors border border-accent/20"
-          >
-            <Plus size={16} />
-            Add Product
-          </Link>
-          <Link
-            href="/seller/products"
-            id="qa-manage-products"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface hover:bg-surface-hover text-foreground font-medium text-sm transition-colors border border-card-border"
-          >
-            <Package size={16} className="text-muted-foreground" />
-            Manage Products
-          </Link>
-          <Link
-            href="/seller/orders"
-            id="qa-view-orders"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface hover:bg-surface-hover text-foreground font-medium text-sm transition-colors border border-card-border"
-          >
-            <ShoppingCart size={16} className="text-muted-foreground" />
-            View Orders
-          </Link>
+        <div className="surface-card p-5">
+          <h2 className="mb-3 text-sm font-semibold text-foreground">
+            Quick actions
+          </h2>
+          <div className="space-y-2">
+            <Link
+              href="/seller/products/new"
+              className="flex items-center gap-3 rounded-lg border border-accent/20 bg-accent/10 px-3.5 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-accent/15"
+            >
+              <Plus size={16} />
+              Add product
+            </Link>
+            <Link
+              href="/seller/products"
+              className="flex items-center gap-3 rounded-lg border border-card-border bg-surface px-3.5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
+            >
+              <Package size={16} className="text-muted-foreground" />
+              Manage products
+            </Link>
+            <Link
+              href="/discover"
+              className="flex items-center gap-3 rounded-lg border border-card-border bg-surface px-3.5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
+            >
+              <ShoppingCart size={16} className="text-muted-foreground" />
+              Browse marketplace
+            </Link>
+          </div>
         </div>
-
       </div>
     </div>
   );

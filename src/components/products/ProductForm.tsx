@@ -277,7 +277,7 @@ export default function ProductForm({
   return (
     <>
       <form
-        className="max-w-4xl mx-auto space-y-6 pb-24 animate-fade-in-up"
+        className="mx-auto max-w-4xl space-y-6 pb-24"
         onSubmit={handleSubmit(
           (data) => onSubmit(data, getValues("status") ?? "draft"),
           onInvalid,
@@ -285,7 +285,7 @@ export default function ProductForm({
       >
         {/* ── Header / Sticky Action Bar ── */}
         <div className="sticky top-0 z-20 mt-2">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between glass p-4 rounded-2xl border-card-border/60 shadow-sm gap-4">
+          <div className="flex flex-col justify-between gap-4 rounded-2xl border border-card-border bg-background/85 p-4 shadow-sm backdrop-blur-xl sm:flex-row sm:items-center">
             <div className="flex items-center gap-4">
               <Link
                 href="/seller/products"
@@ -296,12 +296,12 @@ export default function ProductForm({
               <div>
                 {mode === "edit" ? (
                   <>
-                    <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                      Edit Product
+                    <h1 className="flex items-center gap-2 text-xl font-bold text-foreground">
+                      Edit product
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
                           formValues.status === "published"
-                            ? "bg-green-500/10 text-green-500"
+                            ? "bg-success/10 text-success"
                             : "bg-warning/10 text-warning"
                         }`}
                       >
@@ -327,7 +327,7 @@ export default function ProductForm({
                 ) : (
                   <>
                     <h1 className="text-xl font-bold text-foreground">
-                      Create New Product
+                      Create new product
                     </h1>
                     <p className="text-xs text-muted-foreground">
                       Save as a draft and publish when ready.
@@ -373,9 +373,9 @@ export default function ProductForm({
 
           {/* ── Progress & Alerts ── */}
           {isUploadingAll && (
-            <div className="mt-2 rounded-xl overflow-hidden bg-surface/50 backdrop-blur-sm border border-card-border/40 h-1.5">
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full border border-card-border bg-surface">
               <div
-                className="h-full bg-linear-to-r from-accent to-purple-400 transition-all duration-300 ease-out rounded-full"
+                className="h-full rounded-full bg-accent transition-all duration-300 ease-out"
                 style={{ width: `${overallProgress}%` }}
               />
             </div>
@@ -403,7 +403,7 @@ export default function ProductForm({
 
         <div className="space-y-8 mt-8">
           {/* ── Basic Info ── */}
-          <section className="glass rounded-2xl p-6 md:p-8 space-y-6">
+          <section className="surface-card space-y-6 p-6 md:p-8">
             <div>
               <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-1">
                 <FileText size={18} className="text-accent" /> Basic Info
@@ -435,7 +435,7 @@ export default function ProductForm({
           </section>
 
           {/* ── Pricing ── */}
-          <section className="glass rounded-2xl p-6 md:p-8 space-y-6">
+          <section className="surface-card space-y-6 p-6 md:p-8">
             <div>
               <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-1">
                 <Tag size={18} className="text-accent" /> Pricing
@@ -461,7 +461,7 @@ export default function ProductForm({
           </section>
 
           {/* ── Media ── */}
-          <section className="glass rounded-2xl p-6 md:p-8 space-y-6">
+          <section className="surface-card space-y-6 p-6 md:p-8">
             <div>
               <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-1">
                 <ImageIcon size={18} className="text-accent" /> Media
@@ -550,7 +550,7 @@ export default function ProductForm({
           </section>
 
           {/* ── Delivery Files ── */}
-          <section className="glass rounded-2xl p-6 md:p-8 space-y-6">
+          <section className="surface-card space-y-6 p-6 md:p-8">
             <div>
               <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-1">
                 <Download size={18} className="text-accent" /> Delivery Files
@@ -634,7 +634,7 @@ export default function ProductForm({
           </section>
 
           {/* ── Tags ── */}
-          <section className="glass rounded-2xl p-6 md:p-8 space-y-6">
+          <section className="surface-card space-y-6 p-6 md:p-8">
             <div>
               <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-1">
                 <Plus size={18} className="text-accent" /> Tags

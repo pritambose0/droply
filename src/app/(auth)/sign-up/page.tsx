@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterUserDto, signupSchema } from "@/schemas/authSchema";
 import { AuthAPI } from "@/lib/apiClient";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { ApiError } from "@/lib/axios";
@@ -17,6 +17,8 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedRole = searchParams.get("role") === "creator" ? "creator" : "buyer";
 
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterUserDto>({
     resolver: zodResolver(signupSchema),
@@ -24,7 +26,7 @@ export default function SignUpPage() {
       name: "",
       email: "",
       password: "",
-      role: "buyer" as "buyer" | "creator",
+      role: requestedRole as "buyer" | "creator",
     }
   });
 
@@ -79,9 +81,9 @@ export default function SignUpPage() {
               type="button"
               variant="none"
               onClick={() => setValue("role", "buyer")}
-              className={`py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${role === "buyer"
-                ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "glass text-muted-foreground hover:text-foreground hover:bg-surface-hover"
+              className={`cursor-pointer rounded-xl border py-2.5 text-sm font-medium transition-colors ${role === "buyer"
+                ? "border-accent bg-accent text-white"
+                : "border-card-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground"
                 }`}
             >
               Buy Products
@@ -90,9 +92,9 @@ export default function SignUpPage() {
               type="button"
               variant="none"
               onClick={() => setValue("role", "creator")}
-              className={`py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${role === "creator"
-                ? "bg-accent text-white shadow-lg shadow-accent/20"
-                : "glass text-muted-foreground hover:text-foreground hover:bg-surface-hover"
+              className={`cursor-pointer rounded-xl border py-2.5 text-sm font-medium transition-colors ${role === "creator"
+                ? "border-accent bg-accent text-white"
+                : "border-card-border bg-surface text-muted-foreground hover:bg-surface-hover hover:text-foreground"
                 }`}
             >
               Sell Products
@@ -154,10 +156,10 @@ export default function SignUpPage() {
               {passwordChecks.map((check) => (
                 <div
                   key={check.label}
-                  className={`flex items-center gap-1.5 text-xs transition-colors ${check.valid ? "text-success" : "text-red-900"
+                  className={`flex items-center gap-1.5 text-xs transition-colors ${check.valid ? "text-success" : "text-muted-foreground"
                     }`}
                 >
-                  <span className={`shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${check.valid ? "bg-success/20" : "bg-red-900"}`}>
+                  <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${check.valid ? "border-success/30 bg-success/20 text-success" : "border-card-border bg-surface"}`}>
                     {check.valid && <Check size={10} />}
                   </span>
                   {check.label}
@@ -180,21 +182,16 @@ export default function SignUpPage() {
       </form>
 
       {/* Divider */}
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-card-border" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-[#121216] px-4 text-muted-foreground rounded-full">
-            Already have an account?
-          </span>
-        </div>
+      <div className="my-8 flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="h-px flex-1 bg-card-border" />
+        <span>Already have an account?</span>
+        <div className="h-px flex-1 bg-card-border" />
       </div>
 
       <Link
         href="/sign-in"
         id="signup-go-to-signin"
-        className="block w-full text-center py-3 rounded-xl glass text-foreground font-medium text-sm hover:bg-surface-hover transition-all"
+        className="block w-full rounded-xl border border-card-border bg-surface py-3 text-center text-sm font-medium text-foreground transition-all hover:bg-surface-hover"
       >
         Sign In
       </Link>

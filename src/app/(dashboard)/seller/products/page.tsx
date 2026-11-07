@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { Plus, RefreshCw } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useQueryParams } from "@/hooks/useQueryParams";
@@ -18,6 +17,9 @@ import { EmptyState } from "@/components/products/EmptyState";
 import { NoResults } from "@/components/products/NoResults";
 import { ProductPagination } from "@/components/products/ProductPagination";
 import { DeleteProductModal } from "@/components/products/DeleteProductModal";
+import { PageHeader } from "@/components/ui/PageHeader";
+import ButtonLink from "@/components/ButtonLink";
+import Button from "@/components/Button";
 
 export default function ProductsPage() {
   const { getParam, setParams, clearParams } = useQueryParams();
@@ -104,25 +106,18 @@ export default function ProductsPage() {
   const totalCount = productResponse?.totalProducts || 0;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold bg-linear-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-            Products
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage your digital products ({totalCount} total)
-          </p>
-        </div>
-        <Link
-          href="/seller/products/new"
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-white font-bold text-sm hover:bg-accent/90 transition-all shadow-lg shadow-accent/20 active:scale-95"
-        >
-          <Plus size={18} />
-          <span>New Product</span>
-        </Link>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-6 pb-20">
+      <PageHeader
+        eyebrow="Creator"
+        title="Products"
+        description={`Manage your digital products${totalCount ? ` (${totalCount} total)` : ""}.`}
+        actions={
+          <ButtonLink href="/seller/products/new" className="px-5 py-2.5">
+            <Plus size={16} />
+            New product
+          </ButtonLink>
+        }
+      />
 
       {/* Toolbar */}
       <ProductToolbar
@@ -139,23 +134,20 @@ export default function ProductsPage() {
       {/* Main Content Area */}
       <div className="min-h-[60vh]">
         {isError && !productResponse ? (
-          <div className="glass rounded-3xl p-16 text-center border border-danger/20 flex flex-col items-center justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-danger/10 text-danger flex items-center justify-center mb-4">
-              <RefreshCw size={24} />
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-danger/20 bg-danger/5 p-16 text-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-danger/10 text-danger">
+              <RefreshCw size={22} />
             </div>
-            <h3 className="text-lg font-bold text-foreground mb-1">
+            <h3 className="mb-1 text-lg font-semibold text-foreground">
               Couldn&apos;t load products
             </h3>
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="mb-6 text-sm text-muted-foreground">
               {getApiErrorMessage(error, "Please try again in a moment.")}
             </p>
-            <button
-              onClick={() => refetch()}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-accent/90 transition-all"
-            >
+            <Button onClick={() => refetch()} variant="secondary">
               <RefreshCw size={16} />
               Try again
-            </button>
+            </Button>
           </div>
         ) : isLoading ? (
           viewMode === "grid" ? (

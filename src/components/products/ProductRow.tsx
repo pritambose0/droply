@@ -1,60 +1,53 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Package, Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { ProductResponseDto } from "@/schemas/productSchema";
+import { formatMarketplacePrice } from "@/lib/formatPrice";
 
 interface ProductRowProps {
   product: ProductResponseDto;
   onDeleteRequest: (id: string, title: string) => void;
 }
 
-const currencySymbols: Record<string, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  INR: "₹",
-};
-
 export const ProductRow: React.FC<ProductRowProps> = ({
   product,
   onDeleteRequest,
 }) => {
   return (
-    <div className="glass rounded-xl p-4 flex items-center gap-4 hover:border-accent/20 transition-all group cursor-pointer">
-      <div className="w-16 h-16 rounded-xl bg-linear-to-br from-accent/20 to-purple-500/20 flex items-center justify-center shrink-0">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          className="text-accent/50"
-        >
-          <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
-          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-          <line x1="12" y1="22.08" x2="12" y2="12" />
-        </svg>
+    <div className="flex items-center gap-4 rounded-xl border border-card-border bg-card-bg p-4 transition-colors hover:border-accent/25">
+      <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-card-border bg-surface">
+        {product.thumbnailUrl ? (
+          <Image
+            src={product.thumbnailUrl}
+            alt={product.title}
+            fill
+            sizes="64px"
+            className="object-cover"
+          />
+        ) : (
+          <Package size={24} className="text-muted-foreground/40" strokeWidth={1.5} />
+        )}
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-foreground truncate">
+          <h3 className="truncate font-semibold text-foreground">
             {product.title}
           </h3>
           <StatusBadge status={product.status} />
         </div>
-        <p className="text-xs text-muted-foreground truncate mt-0.5">
+        <p className="mt-0.5 truncate text-xs text-muted-foreground">
           {product.description}
         </p>
-        <div className="flex gap-1.5 mt-1.5">
+        <div className="mt-1.5 flex gap-1.5">
           {product.tags.slice(0, 4).map((tag) => (
             <span
               key={tag}
-              className="px-1.5 py-0.5 rounded bg-surface text-[10px] text-muted-foreground"
+              className="rounded bg-surface px-1.5 py-0.5 text-[10px] text-muted-foreground"
             >
               {tag}
             </span>
@@ -62,34 +55,33 @@ export const ProductRow: React.FC<ProductRowProps> = ({
         </div>
       </div>
 
-      <div className="text-right shrink-0">
+      <div className="shrink-0 text-right">
         <div className="font-bold text-foreground">
-          {currencySymbols[product.currency]}
-          {product.price?.toLocaleString()}
+          {formatMarketplacePrice(product.price ?? 0, product.currency)}
         </div>
         <div className="text-xs text-muted-foreground">
           {product.salesCount} sales
         </div>
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex shrink-0 items-center gap-2">
         <Link
           href={`/products/${product.id}`}
-          className="w-8 h-8 rounded-lg bg-surface hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
           title="View"
         >
           <Eye size={16} />
         </Link>
         <Link
           href={`/seller/products/${product.id}/edit`}
-          className="w-8 h-8 rounded-lg bg-surface hover:bg-surface-hover flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
           title="Edit"
         >
           <Pencil size={16} />
         </Link>
         <button
           onClick={() => onDeleteRequest(product.id, product.title)}
-          className="w-8 h-8 rounded-lg bg-surface hover:bg-danger/10 flex items-center justify-center text-muted-foreground hover:text-danger transition-colors cursor-pointer"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-surface text-muted-foreground transition-colors hover:bg-danger/10 hover:text-danger"
           title="Delete"
         >
           <Trash2 size={16} />

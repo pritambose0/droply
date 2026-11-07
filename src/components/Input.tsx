@@ -35,21 +35,21 @@ const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputProps>(
         ref
     ) => {
         const labelStyles = {
-            default: "text-xs font-medium text-muted-foreground uppercase tracking-wider",
+            default: "text-sm font-medium text-foreground",
             dashboard: "text-sm font-medium text-foreground"
         };
 
         const inputStyles = {
-            default: "py-3 bg-input-bg border-input-border focus:ring-2 focus:ring-input-focus",
-            dashboard: "py-2.5 bg-surface border-input-border focus:ring-1 focus:ring-accent"
+            default: "py-3 bg-surface border-input-border focus:ring-2 focus:ring-input-focus",
+            dashboard: "py-2.5 bg-surface border-input-border focus:ring-2 focus:ring-input-focus"
         };
 
         const commonClasses = twMerge(
-            "w-full px-4 rounded-xl border text-foreground placeholder:text-muted-foreground/50 text-sm focus:outline-none transition-all",
+            "w-full rounded-xl border px-4 text-sm text-foreground transition-all placeholder:text-muted-foreground/50 hover:border-input-border focus:border-accent/50 focus:outline-none",
             inputStyles[variant],
             icon && "pl-11",
             rightIcon && "pr-11",
-            error && "border-danger/50 bg-danger/5 focus:ring-danger/30",
+            error && "border-danger/50 bg-danger/5 focus:border-danger/60 focus:ring-danger/20",
             className
         );
 

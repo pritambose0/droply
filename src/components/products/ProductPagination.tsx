@@ -15,16 +15,16 @@ export const ProductPagination: React.FC<ProductPaginationProps> = ({
   onPageChange,
 }) => {
   return (
-    <div className="flex items-center justify-between pt-6 mt-2 border-t border-card-border/50">
+    <div className="mt-2 flex items-center justify-between border-t border-card-border pt-6">
       <p className="text-sm text-muted-foreground">
-        Page <span className="font-bold text-foreground">{currentPage}</span> of{" "}
-        <span className="font-bold text-foreground">{totalPages}</span>
+        Page <span className="font-semibold text-foreground">{currentPage}</span>{" "}
+        of <span className="font-semibold text-foreground">{totalPages}</span>
       </p>
       <div className="flex items-center gap-2">
         <button
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
-          className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold uppercase tracking-wider rounded-xl border border-card-border bg-card-bg/50 text-foreground hover:bg-card-bg/80 hover:border-accent/30 disabled:opacity-50 disabled:hover:border-card-border disabled:cursor-not-allowed transition-all backdrop-blur-md cursor-pointer"
+          className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-card-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           <ChevronLeft size={16} />
           Previous
@@ -32,7 +32,7 @@ export const ProductPagination: React.FC<ProductPaginationProps> = ({
         <button
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
-          className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-bold uppercase tracking-wider rounded-xl border border-card-border bg-card-bg/50 text-foreground hover:bg-card-bg/80 hover:border-accent/30 disabled:opacity-50 disabled:hover:border-card-border disabled:cursor-not-allowed transition-all backdrop-blur-md cursor-pointer"
+          className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-card-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next
           <ChevronRight size={16} />

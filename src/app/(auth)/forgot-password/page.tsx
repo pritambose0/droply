@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
         <Link
           href={`/reset-password?email=${encodeURIComponent(getValues("email"))}`}
           id="forgot-go-to-reset"
-          className="block w-full py-3 rounded-xl bg-linear-to-r from-accent to-purple-400 text-white font-medium text-sm hover:opacity-90 transition-all shadow-lg shadow-accent/20"
+          className="block w-full rounded-xl bg-accent py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-accent-hover"
         >
           Enter Reset Code
         </Link>

@@ -1,10 +1,10 @@
 "use client";
 
-import { X, Tag, ShoppingCart, Info, CheckCircle2 } from "lucide-react";
+import { X, Tag, Info, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-import Button from "./Button";
 import { useEffect, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { formatMarketplacePrice } from "@/lib/formatPrice";
 
 interface PreviewModalProps {
   isOpen: boolean;
@@ -57,7 +57,7 @@ export default function PreviewModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-xl animate-fade-in"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
       />
 
@@ -100,15 +100,18 @@ export default function PreviewModal({
         {/* Right: Details */}
         <div className="w-full md:w-2/5 p-6 md:p-8 flex flex-col gap-6 overflow-y-auto max-h-[60vh] md:max-h-none">
           <div className="space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
-              {data.title || "Untitled Product"}
+            <h2 className="text-2xl font-bold leading-tight text-foreground md:text-3xl">
+              {data.title || "Untitled product"}
             </h2>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-accent">
-                ${data.price || "0.00"}
+              <span className="text-2xl font-bold text-foreground">
+                {formatMarketplacePrice(
+                  Number(data.price) || 0,
+                  "USD",
+                )}
               </span>
-              <span className="text-xs text-muted-foreground bg-surface px-2 py-0.5 rounded-lg border border-card-border">
-                Instant Delivery
+              <span className="rounded-lg border border-card-border bg-surface px-2 py-0.5 text-xs text-muted-foreground">
+                Preview only
               </span>
             </div>
           </div>
@@ -142,13 +145,10 @@ export default function PreviewModal({
             </div>
           )}
 
-          <div className="mt-auto pt-6 space-y-3">
-            <Button className="w-full py-4 rounded-2xl shadow-xl shadow-accent/20">
-              <ShoppingCart size={18} />
-              Buy Now
-            </Button>
-            <p className="text-[10px] text-center text-muted-foreground">
-              This is a preview of how your product will look to buyers.
+          <div className="mt-auto border-t border-card-border pt-6">
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              This is a preview of how your product details will appear to
+              buyers. Checkout actions are not shown here.
             </p>
           </div>
         </div>

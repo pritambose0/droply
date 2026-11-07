@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { DroplyLogo } from "@/components/ui/Logo";
-import { ShieldCheck, Zap, Star } from "lucide-react";
+import { BadgeCheck, Download, ShieldCheck } from "lucide-react";
 
 const TRUST_POINTS = [
-  { icon: Zap, text: "Instant delivery after purchase" },
-  { icon: ShieldCheck, text: "SSL-encrypted secure checkout" },
-  { icon: Star, text: "Trusted by 2,400+ creators globally" },
+  { icon: ShieldCheck, text: "Email verification with one-time codes" },
+  { icon: BadgeCheck, text: "Separate buyer and creator accounts" },
+  { icon: Download, text: "Download access after a paid order" },
 ];
 
 export default function AuthLayout({
@@ -14,13 +14,9 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background noise grid-pattern flex relative overflow-hidden">
-      {/* Ambient glows */}
-      <div className="absolute top-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent/8 blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-purple-500/8 blur-[140px] pointer-events-none" />
-
+    <div className="relative flex min-h-screen overflow-hidden bg-background">
       {/* ── Left Brand Panel (desktop only) ── */}
-      <div className="hidden lg:flex lg:w-[44%] xl:w-[42%] flex-col justify-between p-12 relative border-r border-card-border/60">
+      <div className="relative hidden flex-col justify-between border-r border-card-border p-12 lg:flex lg:w-[44%] xl:w-[42%]">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group w-fit" id="auth-logo-panel">
           <DroplyLogo />
@@ -32,14 +28,13 @@ export default function AuthLayout({
         {/* Center content */}
         <div className="space-y-8">
           <div>
-            <h2 className="text-3xl font-bold text-foreground leading-tight mb-3">
-              The creator marketplace
-              <br />
+            <h2 className="mb-3 text-3xl font-bold leading-tight text-foreground">
+              The digital product marketplace{" "}
               <span className="gradient-text">built for makers.</span>
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Sell digital products, templates, and more — with secure delivery,
-              instant payouts, and zero complexity.
+            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+              Discover products from independent creators, or open a creator
+              account to list and manage your own catalog.
             </p>
           </div>
 
@@ -77,9 +72,7 @@ export default function AuthLayout({
 
         {/* Card */}
         <div className="w-full max-w-[420px]">
-          <div className="glass rounded-3xl p-8 shadow-2xl animate-fade-in-up">
-            {children}
-          </div>
+          <div className="surface-card p-8">{children}</div>
         </div>
       </div>
     </div>

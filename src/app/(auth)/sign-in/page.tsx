@@ -137,7 +137,7 @@ function SignInContent() {
                 type="button"
                 onClick={handleResendEmail}
                 disabled={isResending}
-                className="px-4 py-2 rounded-lg bg-white/10 text-white text-xs font-semibold hover:bg-white/20 transition-colors disabled:opacity-50"
+                className="rounded-lg border border-card-border bg-surface px-4 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-surface-hover disabled:opacity-50"
                 id="signin-resend-btn"
               >
                 {isResending ? "Sending..." : "Resend Email"}
@@ -161,8 +161,8 @@ function SignInContent() {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Password {<span className="text-red-500">*</span>}
+            <span className="text-sm font-medium text-foreground">
+              Password <span className="text-danger">*</span>
             </span>
             <Link
               href="/forgot-password"
@@ -205,21 +205,16 @@ function SignInContent() {
         </Button>
       </form>
 
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-card-border" />
-        </div>
-        <div className="relative flex justify-center text-xs">
-          <span className="bg-[#121216] px-4 text-muted-foreground rounded-full">
-            New to Droply?
-          </span>
-        </div>
+      <div className="my-8 flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="h-px flex-1 bg-card-border" />
+        <span>New to Droply?</span>
+        <div className="h-px flex-1 bg-card-border" />
       </div>
 
       <Link
         href="/sign-up"
         id="signin-go-to-signup"
-        className="block w-full text-center py-3 rounded-xl glass text-foreground font-medium text-sm hover:bg-surface-hover transition-all"
+        className="block w-full rounded-xl border border-card-border bg-surface py-3 text-center text-sm font-medium text-foreground transition-all hover:bg-surface-hover"
       >
         Create an account
       </Link>
