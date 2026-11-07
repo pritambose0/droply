@@ -9,8 +9,14 @@ import {
   UpdateProductDto,
   ProductResponseDto,
   GetAllProductsInput,
+  GetAllMarketplaceProductsInput,
 } from "@/schemas/productSchema";
 import { CreateOrderDto } from "@/schemas/orderSchema";
+import type {
+  MarketplaceCategoriesResponse,
+  MarketplaceProductDetail,
+  MarketplaceProductsResponse,
+} from "@/types/marketplace";
 import { axiosInstance, APIResponse } from "./axios";
 
 export interface SignatureResponse {
@@ -58,6 +64,17 @@ export const ProductAPI = {
     axiosInstance.get(`/products/${productId}/download`, {
       params: { orderId },
     }),
+};
+
+export const MarketplaceAPI = {
+  getAll: (
+    params?: GetAllMarketplaceProductsInput,
+  ): Promise<APIResponse<MarketplaceProductsResponse>> =>
+    axiosInstance.get("/marketplace", { params }),
+  getById: (id: string): Promise<APIResponse<MarketplaceProductDetail>> =>
+    axiosInstance.get(`/marketplace/${id}`),
+  getCategories: (): Promise<APIResponse<MarketplaceCategoriesResponse>> =>
+    axiosInstance.get("/marketplace/categories"),
 };
 
 export const OrderAPI = {

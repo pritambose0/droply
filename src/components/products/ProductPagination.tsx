@@ -17,14 +17,8 @@ export const ProductPagination: React.FC<ProductPaginationProps> = ({
   return (
     <div className="flex items-center justify-between pt-6 mt-2 border-t border-card-border/50">
       <p className="text-sm text-muted-foreground">
-        Page{" "}
-        <span className="font-bold text-foreground">
-          {currentPage}
-        </span>{" "}
-        of{" "}
-        <span className="font-bold text-foreground">
-          {totalPages}
-        </span>
+        Page <span className="font-bold text-foreground">{currentPage}</span> of{" "}
+        <span className="font-bold text-foreground">{totalPages}</span>
       </p>
       <div className="flex items-center gap-2">
         <button

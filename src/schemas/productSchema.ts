@@ -67,6 +67,35 @@ export const getAllProductsSchema = z.object({
   status: z.enum(["all", "draft", "published"]).optional(),
 });
 
+export const MARKETPLACE_SORT_OPTIONS = [
+  "popular",
+  "newest",
+  "price-asc",
+  "price-desc",
+] as const;
+
+export const MARKETPLACE_PRICE_FILTERS = ["all", "free", "paid"] as const;
+
+export const getAllMarketplaceProductsSchema = z.object({
+  page: z
+    .number()
+    .int()
+    .min(1, "Page must be at least 1")
+    .optional()
+    .default(1),
+  limit: z
+    .number()
+    .int()
+    .min(1, "Limit must be at least 1")
+    .max(48, "Limit must be at most 48")
+    .optional()
+    .default(9),
+  query: z.string().trim().optional().default(""),
+  sortBy: z.enum(MARKETPLACE_SORT_OPTIONS).optional().default("popular"),
+  tag: z.string().trim().optional().default(""),
+  price: z.enum(MARKETPLACE_PRICE_FILTERS).optional().default("all"),
+});
+
 export const productFormSchema = createProductSchema.omit({
   fileUrl: true,
   thumbnailUrl: true,
@@ -87,5 +116,26 @@ export type CreateProductInput = z.input<typeof createProductSchema>;
 export type UpdateProductDto = z.infer<typeof updateProductSchema>;
 export type GetAllProductsDto = z.infer<typeof getAllProductsSchema>;
 export type GetAllProductsInput = z.input<typeof getAllProductsSchema>;
+export type GetAllMarketplaceProductsDto = z.infer<
+  typeof getAllMarketplaceProductsSchema
+>;
+export type GetAllMarketplaceProductsInput = z.input<
+  typeof getAllMarketplaceProductsSchema
+>;
+export type MarketplaceSortBy = (typeof MARKETPLACE_SORT_OPTIONS)[number];
+export type MarketplacePriceFilter =
+  (typeof MARKETPLACE_PRICE_FILTERS)[number];
+
+export function isMarketplaceSortBy(
+  value: string,
+): value is MarketplaceSortBy {
+  return (MARKETPLACE_SORT_OPTIONS as readonly string[]).includes(value);
+}
+
+export function isMarketplacePriceFilter(
+  value: string,
+): value is MarketplacePriceFilter {
+  return (MARKETPLACE_PRICE_FILTERS as readonly string[]).includes(value);
+}
 export type ProductFormSchema = z.input<typeof productFormSchema>;
 export type ProductResponseDto = z.infer<typeof productResponseSchema>;
